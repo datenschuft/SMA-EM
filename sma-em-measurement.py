@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# coding=utf-8
 """
  * 
  * by Wenger Florian 2015-05-06

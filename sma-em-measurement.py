@@ -62,7 +62,8 @@ while True:
   
   # split the received message to seperate vars
   # summary 
-  # ääääääääääääääääääääääääääääääääääääääääääääääääääääääääää regard/Bezug=getting energy from main grid   surplus/surplus=putting energy to the main grid
+  # regard/Bezug=getting energy from main grid
+  # surplus/surplus=putting energy to the main grid
   smaserial=hex2dec(smainfoasci[40:48])
   pregard=hex2dec(smainfoasci[64:72])/10
   psurplus=hex2dec(smainfoasci[104:112])/10
@@ -109,7 +110,7 @@ while True:
   # cos phi is always positive, no matter what quadrant 
   print ('\n')
   print ('SMA-EM Serial:{}'.format(smaserial))
-  print ('NOTE: I\'m not sure about the direction of Q (cap. ind.)')
+  # print ('NOTE: I\'m not sure about the direction of Q (cap. ind.)')
   print ('----sum----')
   print ('P: regard:{}W  surplus:{}W'.format(pregard,psurplus))
   print ('S: regard:{}VA surplus:{}VA'.format(sregard,ssurplus))

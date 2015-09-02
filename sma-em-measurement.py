@@ -2,7 +2,7 @@
 # coding=utf-8
 """
  * 
- * by Wenger Florian 2015-05-06
+ * by Wenger Florian 2015-09-02
  * wenger@unifox.at
  *
  * endless loop (until ctrl+c) displays measurement from SMA Energymeter
@@ -27,7 +27,7 @@ import binascii
 import signal
 import sys
 
-# listen to the broadcasts; SMA-Energymeter broadcasts is measurements to 239.12.255.254:9522
+# listen to the broadcasts; SMA-Energymeter sends its measurements to 239.12.255.254:9522
 MCAST_GRP = '239.12.255.254'
 MCAST_PORT = 9522
 
@@ -66,11 +66,17 @@ while True:
   # surplus/surplus=putting energy to the main grid
   smaserial=hex2dec(smainfoasci[40:48])
   pregard=hex2dec(smainfoasci[64:72])/10
+  pregardcounter=hex2dec(smainfoasci[80:96])/3600000
   psurplus=hex2dec(smainfoasci[104:112])/10
+  psurpluscounter=hex2dec(smainfoasci[120:136])/3600000
   qregard=hex2dec(smainfoasci[144:152])/10
+  qregardcounter=hex2dec(smainfoasci[160:176])/3600000
   qsurplus=hex2dec(smainfoasci[184:192])/10
+  qsurpluscounter=hex2dec(smainfoasci[200:216])/3600000
   sregard=hex2dec(smainfoasci[224:232])/10
+  sregardcounter=hex2dec(smainfoasci[240:256])/3600000
   ssurplus=hex2dec(smainfoasci[264:272])/10
+  ssurpluscounter=hex2dec(smainfoasci[280:296])/3600000
   cosphi=hex2dec(smainfoasci[304:312])/1000
   #L1
   p1regard=hex2dec(smainfoasci[320:328])/10
@@ -112,9 +118,9 @@ while True:
   print ('SMA-EM Serial:{}'.format(smaserial))
   # print ('NOTE: I\'m not sure about the direction of Q (cap. ind.)')
   print ('----sum----')
-  print ('P: regard:{}W  surplus:{}W'.format(pregard,psurplus))
-  print ('S: regard:{}VA surplus:{}VA'.format(sregard,ssurplus))
-  print ('Q: cap {}VAr ind {}VAr'.format(qregard,qsurplus))
+  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(pregard,pregardcounter,psurplus,psurpluscounter))
+  print ('S: regard:{}VA {}kWh surplus:{}VA {}kWh'.format(sregard,sregardcounter,ssurplus,ssurpluscounter))
+  print ('Q: cap {}VAr {}kWh ind {}VAr {}kWh'.format(qregard,qregardcounter,qsurplus,qsurpluscounter))
   print ('cos phi:{}°'.format(cosphi))
   print ('----L1----')
   print ('P: regard:{}W  surplus:{}W'.format(p1regard,p1surplus))

@@ -80,31 +80,50 @@ while True:
   cosphi=hex2dec(smainfoasci[304:312])/1000
   #L1
   p1regard=hex2dec(smainfoasci[320:328])/10
+  p1regardcounter=hex2dec(smainfoasci[336:352])/3600000
   p1surplus=hex2dec(smainfoasci[360:368])/10
+  p1surpluscounter=hex2dec(smainfoasci[376:392])/3600000
   q1regard=hex2dec(smainfoasci[400:408])/10
+  q1regardcounter=hex2dec(smainfoasci[416:432])/3600000
   q1surplus=hex2dec(smainfoasci[440:448])/10
+  q1surpluscounter=hex2dec(smainfoasci[456:472])/3600000
   s1regard=hex2dec(smainfoasci[480:488])/10
+  s1regardcounter=hex2dec(smainfoasci[496:512])/3600000
   s1surplus=hex2dec(smainfoasci[520:528])/10
+  s1surpluscounter=hex2dec(smainfoasci[536:552])/3600000
   thd1=hex2dec(smainfoasci[560:568])/1000
   v1=hex2dec(smainfoasci[576:584])/1000
   cosphi1=hex2dec(smainfoasci[592:600])/1000
   #L2
   p2regard=hex2dec(smainfoasci[608:616])/10
+  p2regardcounter=hex2dec(smainfoasci[624:640])/3600000
   p2surplus=hex2dec(smainfoasci[648:656])/10
+  p2surpluscounter=hex2dec(smainfoasci[664:680])/3600000
   q2regard=hex2dec(smainfoasci[688:696])/10
+  q2regardcounter=hex2dec(smainfoasci[704:720])/3600000
   q2surplus=hex2dec(smainfoasci[728:736])/10
+  q2surpluscounter=hex2dec(smainfoasci[744:760])/3600000
   s2regard=hex2dec(smainfoasci[768:776])/10
+  s2regardcounter=hex2dec(smainfoasci[784:800])/3600000
   s2surplus=hex2dec(smainfoasci[808:816])/10
+  s2surpluscounter=hex2dec(smainfoasci[824:840])/3600000
   thd2=hex2dec(smainfoasci[848:856])/1000
   v2=hex2dec(smainfoasci[864:872])/1000
   cosphi2=hex2dec(smainfoasci[880:888])/1000
   #L3
   p3regard=hex2dec(smainfoasci[896:904])/10
+  
+  p3regardcounter=hex2dec(smainfoasci[912:928])/3600000
   p3surplus=hex2dec(smainfoasci[936:944])/10
+  p3surpluscounter=hex2dec(smainfoasci[952:968])/3600000
   q3regard=hex2dec(smainfoasci[976:984])/10
+  q3regardcounter=hex2dec(smainfoasci[992:1008])/3600000
   q3surplus=hex2dec(smainfoasci[1016:1024])/10
+  q3surpluscounter=hex2dec(smainfoasci[1032:1048])/3600000
   s3regard=hex2dec(smainfoasci[1056:1064])/10
+  s3regardcounter=hex2dec(smainfoasci[1072:1088])/3600000
   s3surplus=hex2dec(smainfoasci[1096:1104])/10
+  s3surpluscounter=hex2dec(smainfoasci[1112:1128])/3600000
   thd3=hex2dec(smainfoasci[1136:1144])/1000
   v3=hex2dec(smainfoasci[1152:1160])/1000
   cosphi3=hex2dec(smainfoasci[1168:1176])/1000
@@ -119,21 +138,21 @@ while True:
   # print ('NOTE: I\'m not sure about the direction of Q (cap. ind.)')
   print ('----sum----')
   print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(pregard,pregardcounter,psurplus,psurpluscounter))
-  print ('S: regard:{}VA {}kWh surplus:{}VA {}kWh'.format(sregard,sregardcounter,ssurplus,ssurpluscounter))
-  print ('Q: cap {}VAr {}kWh ind {}VAr {}kWh'.format(qregard,qregardcounter,qsurplus,qsurpluscounter))
+  print ('S: regard:{}VA {}kVAh surplus:{}VA {}VAh'.format(sregard,sregardcounter,ssurplus,ssurpluscounter))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(qregard,qregardcounter,qsurplus,qsurpluscounter))
   print ('cos phi:{}°'.format(cosphi))
   print ('----L1----')
-  print ('P: regard:{}W  surplus:{}W'.format(p1regard,p1surplus))
-  print ('S: regard:{}VA surplus:{}VA'.format(s1regard,s1surplus))
-  print ('Q: cap {}VAr ind {}VAr'.format(q1regard,q1surplus))
+  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(p1regard,p1regardcounter,p1surplus,p1surpluscounter))
+  print ('S: regard:{}VA {}kVAh surplus:{}VA {}kVAh'.format(s1regard,s1regardcounter,s1surplus,s1surpluscounter))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(q1regard,q1regardcounter,q1surplus,q1surpluscounter))
   print ('U: {}V thd:{}% cos phi:{}°'.format(v1,thd1,cosphi1))
   print ('----L2----')
-  print ('P: regard:{}W  surplus:{}W'.format(p2regard,p2surplus))
-  print ('S: regard:{}VA surplus:{}VA'.format(s2regard,s2surplus))
-  print ('Q: cap {}VAr ind {}VAr'.format(q2regard,q2surplus))
+  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(p2regard,p2regardcounter,p2surplus,p2surpluscounter))
+  print ('S: regard:{}VA {}kVAh surplus:{}VA {}kVAh'.format(s2regard,s2regardcounter,s2surplus,s2surpluscounter))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(q2regard,q2regardcounter,q2surplus,q2surpluscounter))
   print ('U: {}V thd:{}% cos phi:{}°'.format(v2,thd2,cosphi2))
   print ('----L3----')
-  print ('P: regard:{}W  surplus:{}W'.format(p3regard,p3surplus))
-  print ('S: regard:{}VA surplus:{}VA'.format(s3regard,s3surplus))
-  print ('Q: cap {}VAr ind {}VAr'.format(q3regard,q3surplus))
+  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(p3regard,p3regardcounter,p3surplus,p3surpluscounter))
+  print ('S: regard:{}VA {}kVAh surplus:{}VA {}kVAh'.format(s3regard,s3regardcounter,s3surplus,s3surpluscounter))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(q3regard,q3regardcounter,q3surplus,q3surpluscounter))
   print ('U: {}V thd:{}% cos phi:{}°'.format(v3,thd3,cosphi3))

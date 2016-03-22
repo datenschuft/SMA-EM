@@ -2,7 +2,7 @@
 # coding=utf-8
 """
  * 
- * by Wenger Florian 2015-08-15
+ * by Wenger Florian 2015-11-12
  * wenger@unifox.at
  * 
  *  this software is released under GNU General Public License, version 2.
@@ -25,11 +25,19 @@ import smaem
   
 class MyDaemon(daemon3x):
 	def run(self):
+		emparts = {}
 		while True:
-			time.sleep(1)
+			#time.sleep(1)
 			#print ("1")
 			#readem()
-			smaem.readem()
+			emparts=smaem.readem()
+			file = open("/run/shm/em-regard", "w")
+			file.write('%.2f' % emparts['pregard'])
+			file.close()
+			file = open("/run/shm/em-surplus", "w")
+			file.write('%.2f' % emparts['psurplus'])
+			file.close() 
+
   
 if __name__ == "__main__":
 	daemon = MyDaemon('/tmp/daemon-example.pid')

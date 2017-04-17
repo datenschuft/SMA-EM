@@ -40,7 +40,7 @@ apt install python3 cl-py-configparser
 mkdir /opt/smaem/
 mkdir /etc/smaemd/
 cp daemon3x.py sma-daemon.py  smaem.py /opt/smaem/
-cp systemd-settings /etc/systemd/smaemd.service
+cp systemd-settings /etc/systemd/system/smaemd.service
 ```
 create a /etc/smaemd/config - file <br>
 update systemd

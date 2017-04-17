@@ -42,7 +42,7 @@ mkdir /etc/smaemd/
 cp daemon3x.py sma-daemon.py  smaem.py /opt/smaem/
 cp systemd-settings /etc/systemd/smaemd.service
 ```
-create a mkdir /etc/smaemd/config - file <br>
+create a /etc/smaemd/config - file <br>
 update systemd
 ```
 systemctl daemon-reload

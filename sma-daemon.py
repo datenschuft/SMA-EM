@@ -21,6 +21,9 @@
 import sys, time
 from daemon3x import daemon3x
 from configparser import SafeConfigParser
+import urllib.request
+from urllib.error import URLError
+import json
 import smaem
 import socket
 import struct
@@ -33,7 +36,7 @@ parser.read('/etc/smaemd/config')
 smaemserials=parser.get('SMA-EM', 'serials')
 serials=smaemserials.split(' ')
 smavalues=parser.get('SMA-EM', 'values')
-values=smavalues.split(' ')
+values=filter(len, smavalues.split(' '))
 pidfile=parser.get('DAEMON', 'pidfile')
 ipbind=parser.get('DAEMON', 'ipbind')
 MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
@@ -44,6 +47,11 @@ if MCAST_GRP == "":
     MCAST_GRP = '239.12.255.254'
 if MCAST_PORT == 0:
     MCAST_PORT = 9522
+
+domoticz = {}
+for key in parser.sections():
+	if key.startswith('DOMOTICZ-'):
+		domoticz[key[9:]] = parser[key]
 
 class MyDaemon(daemon3x):
 	def run(self):
@@ -74,6 +82,33 @@ class MyDaemon(daemon3x):
 				#print(serial)
 				#print(emparts['serial'])
 				if serial==format(emparts['serial']):
+					if serial in domoticz:
+						dom = domoticz[serial]
+
+                        # Only update every X seconds
+						if time.time() < domoticz.get('last_update', 0) + int(domoticz.get('min_update', 20)):
+							#print("skipping")
+							continue
+						domoticz['last_update'] = time.time()
+
+						for key in dom:
+							if key in ['api', 'min_update', 'last_update']:
+								continue
+
+							url = "%s?type=command&param=udevice&idx=%s&nvalue=0&svalue=" % (dom['api'], dom[key])
+							if key in ['pregard', 'p1regard', 'p2regard', 'p3regard']:
+								url += "%0.2f;%0.2f" % (emparts[key], emparts[key + "counter"] * 1000)
+							else:
+								url += "%0.2f" % emparts[key]
+
+							#print(url)
+							try:
+								urllib.request.urlopen( url )
+							except URLError as e:	   # ignore if domoticz was down
+								print("Error from domoticz request")
+								print(e)
+								pass
+
 					#print("match")
 					for value in values:
 						file = open("/run/shm/em-"+format(serial)+"-"+format(value), "w")

@@ -2,7 +2,7 @@
 # coding=utf-8
 """
  *
- * by Wenger Florian 2016-07-12
+ * by Wenger Florian 2017-12-28
  * wenger@unifox.at
  *
  *  this software is released under GNU General Public License, version 2.
@@ -22,6 +22,9 @@ import sys, time
 from daemon3x import daemon3x
 from configparser import SafeConfigParser
 import smaem
+import socket
+import struct
+
 
 #read configuration
 parser = SafeConfigParser()
@@ -32,12 +35,41 @@ serials=smaemserials.split(' ')
 smavalues=parser.get('SMA-EM', 'values')
 values=smavalues.split(' ')
 pidfile=parser.get('DAEMON', 'pidfile')
+ipbind=parser.get('DAEMON', 'ipbind')
+MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
+MCAST_PORT = int(parser.get('DAEMON', 'mcastport'))
+
+#set defaults
+if MCAST_GRP == "":
+    MCAST_GRP = '239.12.255.254'
+if MCAST_PORT == 0:
+    MCAST_PORT = 9522
 
 class MyDaemon(daemon3x):
 	def run(self):
+		# prepare listen to socket-Multicast
+		socketconnected = False
+		while not socketconnected:
+			#try:
+			sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+			sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+			sock.bind(('', MCAST_PORT))
+			try:
+				mreq = struct.pack("4s4s", socket.inet_aton(MCAST_GRP), socket.inet_aton(ipbind))
+				sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+				file = open("/run/shm/em-status", "w")
+				file.write('multicastgroup connected')
+				file.close()
+				socketconnected = True
+			except BaseException:
+				print('could not connect to mulicast group... rest a bit and retry')
+				file = open("/run/shm/em-status", "w")
+				file.write('could not connect to mulicast group... rest a bit and retry')
+				file.close()
+				time.sleep(5)
 		emparts = {}
 		while True:
-			emparts=smaem.readem()
+			emparts=smaem.readem(sock)
 			for serial in serials:
 				#print(serial)
 				#print(emparts['serial'])
@@ -57,6 +89,8 @@ if __name__ == "__main__":
 			daemon.stop()
 		elif 'restart' == sys.argv[1]:
 			daemon.restart()
+		elif 'run' == sys.argv[1]:
+			daemon.run()
 		else:
 			print ("Unknown command")
 			sys.exit(2)

@@ -1,31 +1,32 @@
 """
- * 
+ *
  * by Wenger Florian 2015-11-12
  * wenger@unifox.at
  *
  *
- * 
+ *
  *  this software is released under GNU General Public License, version 2.
- *  This program is free software; 
- *  you can redistribute it and/or modify it under the terms of the GNU General Public License 
+ *  This program is free software;
+ *  you can redistribute it and/or modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; version 2 of the License.
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *  See the GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License along with this program; 
- *  if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  
- * 
+ *
+ *  You should have received a copy of the GNU General Public License along with this program;
+ *  if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
  */
 """
-import socket
+#import socket
 import struct
 import binascii
 
 
+
 # listen to the Multicast; SMA-Energymeter sends its measurements to 239.12.255.254:9522
-MCAST_GRP = '239.12.255.254'
-MCAST_PORT = 9522
+#MCAST_GRP = '239.12.255.254'
+#MCAST_PORT = 9522
 
 
 # function to transform HEX to DEC
@@ -35,30 +36,30 @@ def hex2dec(s):
 
 # clean exit
 def abortprogram(signal,frame):
-    # Housekeeping -> nothing to cleanup 
+    # Housekeeping -> nothing to cleanup
     print('STRG + C = end program')
     sys.exit(0)
 
-    
-    
+
+
 # prepare listen to socket-Multicast
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-sock.bind(('', MCAST_PORT))
-mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+#sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+#sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#sock.bind(('', MCAST_PORT))
+#mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
+#sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 
-def readem():  
+def readem(sock):
   smainfo=sock.recv(600)
   smainfoasci=binascii.b2a_hex(smainfo)
-  
+
   # split the received message to seperate vars
-  # summary 
+  # summary
   # regard/Bezug=getting energy from main grid
   # surplus/surplus=putting energy to the main grid
-  
-  
+
+
   smaserial=hex2dec(smainfoasci[40:48])
   pregard=hex2dec(smainfoasci[64:72])/10
   pregardcounter=hex2dec(smainfoasci[80:96])/3600000
@@ -107,7 +108,7 @@ def readem():
   cosphi2=hex2dec(smainfoasci[880:888])/1000
   #L3
   p3regard=hex2dec(smainfoasci[896:904])/10
-  
+
   p3regardcounter=hex2dec(smainfoasci[912:928])/3600000
   p3surplus=hex2dec(smainfoasci[936:944])/10
   p3surpluscounter=hex2dec(smainfoasci[952:968])/3600000
@@ -122,10 +123,10 @@ def readem():
   thd3=hex2dec(smainfoasci[1136:1144])/1000
   v3=hex2dec(smainfoasci[1152:1160])/1000
   cosphi3=hex2dec(smainfoasci[1168:1176])/1000
-  
+
   #Returning values
   emparts = {'serial':smaserial,'pregard':pregard,'pregardcounter':pregardcounter,'psurplus':psurplus,'psurpluscounter':psurpluscounter,
-  'sregard':sregard,'sregardcounter':sregardcounter,'ssurplus':ssurplus,'ssurpluscounter':ssurpluscounter, 
+  'sregard':sregard,'sregardcounter':sregardcounter,'ssurplus':ssurplus,'ssurpluscounter':ssurpluscounter,
   'qregard':qregard,'qregardcounter':qregardcounter,'qsurplus':qsurplus,'qsurpluscounter':qsurpluscounter,
   'cosphi':cosphi,
   'p1regard':p1regard,'p1regardcounter':p1regardcounter,'p1surplus':p1surplus,'p1surpluscounter':p1surpluscounter,
@@ -141,4 +142,3 @@ def readem():
   'q3regard':q3regard,'q3regardcounter':q3regardcounter,'q3surplus':q3surplus,'q3surpluscounter':q3surpluscounter,
   'v3':v3,'thd3':thd3,'cosphi3':cosphi3 }
   return emparts
-  

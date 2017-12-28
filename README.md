@@ -15,7 +15,8 @@ signal
 
 ## Configuration
 create a config file in /etc/smaemd/config<br>
-Example
+Use UTF-8 encoded configfile<br>
+Example:
 ```
 [SMA-EM]
 # serials of sma-ems the daemon should take notice
@@ -26,6 +27,14 @@ values=pregard psurplus qsurplus ssurplus
 
 [DAEMON]
 pidfile=/run/smaemd.pid
+# listen on an interface with the given ip
+# use 0.0.0.0 for any interface
+ipbind=192.168.8.15
+# multicast ip and port of sma-datagrams
+# defaults
+mcastgrp=239.12.255.254
+mcastport=9522
+
 ```
 
 ## Routing
@@ -34,19 +43,21 @@ maybe you have to add a route (example: on hosts with more than one interface) <
 sudo ip route add 224.0.0.0/4 dev interfacename
 ```
 
-## Install / Copy
+## Install / Copy (tested on Raspbian 9.1)
 ```
+apt install git
 apt install python3 cl-py-configparser
-mkdir /opt/smaem/
+mkdir /opt/smaemd/
 mkdir /etc/smaemd/
-cp daemon3x.py sma-daemon.py  smaem.py /opt/smaem/
+cd /opt/smaemd/
+git clone https://github.com/datenschuft/SMA-EM.git .
 cp systemd-settings /etc/systemd/system/smaemd.service
 ```
-create a /etc/smaemd/config - file <br>
+create a /etc/smaemd/config - file (see example above)<br>
 update systemd
 ```
 systemctl daemon-reload
 systemctl enable smaemd.service
 systemctl start smaemd.service
 ```
-feel lucky
+feel lucky and read /run/shm/em-<serial>-<value>

@@ -2,7 +2,7 @@
 # coding=utf-8
 """
  *
- * by Wenger Florian 2017-12-28
+ * by Wenger Florian 2018-01-30
  * wenger@unifox.at
  *
  *  this software is released under GNU General Public License, version 2.
@@ -38,6 +38,32 @@ pidfile=parser.get('DAEMON', 'pidfile')
 ipbind=parser.get('DAEMON', 'ipbind')
 MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
 MCAST_PORT = int(parser.get('DAEMON', 'mcastport'))
+features=parser.get('SMA-EM', 'features')
+features=features.split(' ')
+
+
+import importlib
+
+#Check features and load
+featurelist = {}
+featurecounter=0
+for feature in features:
+    #print ('import ' + feature + '.py')
+    featureitem={}
+    featureitem={'name':feature}
+    try:
+       featureitem['feature'] = importlib.import_module('features.' + feature)
+    except (ImportError, FileNotFoundError, TypeError):
+       print('feature '+feature+ ' not found')
+       sys.exit()
+    try:
+        featureitem['config']=dict(parser.items('FEATURE-'+feature))
+        #print (featureitem['config'])
+    except:
+       print('feature '+feature+ ' not configured')
+       sys.exit()
+    featurelist[featurecounter]=featureitem
+    featurecounter += 1
 
 #set defaults
 if MCAST_GRP == "":
@@ -69,23 +95,26 @@ class MyDaemon(daemon3x):
 				time.sleep(5)
 		emparts = {}
 		while True:
+			#getting sma values
 			emparts=smaem.readem(sock)
 			for serial in serials:
-				#print(serial)
-				#print(emparts['serial'])
+				# process only known sma serials
 				if serial==format(emparts['serial']):
-					#print("match")
-					for value in values:
-						file = open("/run/shm/em-"+format(serial)+"-"+format(value), "w")
-						file.write('%.4f' % emparts[value])
-						file.close()
+					# running all enabled features
+					for featurenr in featurelist:
+						#print('>>> starting '+featurelist[featurenr]['name'])
+						featurelist[featurenr]['feature'].run(emparts,featurelist[featurenr]['config'])
 
+#Daemon - Coding
 if __name__ == "__main__":
 	daemon = MyDaemon(pidfile)
 	if len(sys.argv) == 2:
 		if 'start' == sys.argv[1]:
 			daemon.start()
 		elif 'stop' == sys.argv[1]:
+			for featurenr in featurelist:
+				print('>>> stopping '+featurelist[featurenr]['name'])
+				featurelist[featurenr]['feature'].stopping(emparts,featurelist[featurenr]['config'])
 			daemon.stop()
 		elif 'restart' == sys.argv[1]:
 			daemon.restart()
@@ -96,6 +125,6 @@ if __name__ == "__main__":
 			sys.exit(2)
 		sys.exit(0)
 	else:
-		print ("usage: %s start|stop|restart" % sys.argv[0])
+		print ("usage: %s start|stop|restart|run" % sys.argv[0])
 		print (pidfile)
 		sys.exit(2)

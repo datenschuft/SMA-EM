@@ -35,6 +35,19 @@ ipbind=192.168.8.15
 mcastgrp=239.12.255.254
 mcastport=9522
 
+#each feature/plugin has its own section
+#called FEATURE-[featurename]
+
+[FEATURE-simplefswriter]
+# list serials simplefswriter notice
+serials=1900204522
+# measurement vars simplefswriter should write to filesystem (only from smas with serial in serials)
+values=pregard psurplus qsurplus ssurplus
+
+[FEATURE-sample]
+nothing=here
+
+
 ```
 
 ## Routing

@@ -22,6 +22,11 @@ Example:
 # serials of sma-ems the daemon should take notice
 # seperated by space
 serials=123456 1900204522
+# features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
+# list of features to load/run
+features=simplefswriter sample
+
+
 # measurement values
 values=pregard psurplus qsurplus ssurplus
 
@@ -35,8 +40,9 @@ ipbind=192.168.8.15
 mcastgrp=239.12.255.254
 mcastport=9522
 
-#each feature/plugin has its own section
-#called FEATURE-[featurename]
+# each feature/plugin has its own section
+# called FEATURE-[featurename]
+# the feature section is required if a feature is listed in [SMA-EM]features
 
 [FEATURE-simplefswriter]
 # list serials simplefswriter notice
@@ -46,7 +52,7 @@ values=pregard psurplus qsurplus ssurplus
 
 [FEATURE-sample]
 nothing=here
-
+ex
 
 ```
 

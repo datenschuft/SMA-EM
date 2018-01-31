@@ -26,10 +26,6 @@ serials=123456 1900204522
 # list of features to load/run
 features=simplefswriter sample
 
-
-# measurement values
-values=pregard psurplus qsurplus ssurplus
-
 [DAEMON]
 pidfile=/run/smaemd.pid
 # listen on an interface with the given ip
@@ -52,7 +48,6 @@ values=pregard psurplus qsurplus ssurplus
 
 [FEATURE-sample]
 nothing=here
-ex
 
 ```
 

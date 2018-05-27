@@ -1,6 +1,7 @@
 """
  * Feature-Module for SMA-EM daemon
- * Simple measurement to file writer
+ * sample class for features
+ * other features extends this class
  * by Wenger Florian 2018-05-27
  *
  *
@@ -17,25 +18,18 @@
  *
  */
 """
-
-from features.smafeature import smafeature
-#import features.smafeature
-class feature(smafeature):
+class smafeature:
     def __init__(self):
-        super().__init__()
-        print("initialisation of feature simplefswriter")
-
-    def run (self,emparts):
-        config=self.getconfig()
-        values=config['values'].split(' ')
-        serials=config['serials'].split(' ')
-        for serial in serials:
-            if serial==format(emparts['serial']):
-                for value in values:
-                    #print ("-"+format(value)+('%.4f' % emparts[value]))
-                    #print (value)
-                    file = open("/run/shm/em-"+format(serial)+"-"+format(value), "w")
-                    file.write('%.4f' % emparts[value])
-                    file.close()
+        #print("initialisation of feature")
+        self.__config = {}
+    def loadconfig(self,config):
+        self.__config = config
+        print("----config----")
+        print(self.__config)
+        print("----config end----")
+    def getconfig(self):
+        return self.__config
+    def run(self,emparts):
+        print("prozessing emparts ... is not implemented !")
     def cleanup(self):
-        print("closing filehandles")
+        print("cleanup housekeeping of feature ... is not implemented !")

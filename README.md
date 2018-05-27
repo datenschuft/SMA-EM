@@ -1,4 +1,5 @@
-# SMA-EM
+# SMA-EM DEVELOPMENT / EXPERIMENTAL BRANCH
+maybe there are horrible errors
 
 ## SMA Energymeter measurement
 sma-em-measurement.py: Python3 loop display SMA Energymeter measurement values

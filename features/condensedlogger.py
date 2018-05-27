@@ -1,8 +1,7 @@
 """
  * Feature-Module for SMA-EM daemon
- * sample class for features
- * just an example
- * by Wenger Florian 2018-05-27
+ * condensed measurement logger
+ * by Wenger Florian 2018-03-25
  *
  *
  *  this software is released under GNU General Public License, version 2.
@@ -19,19 +18,19 @@
  */
 """
 
+def run(emparts,config):
+    print("running feature condensedlogger")
+    values=config['values'].split(' ')
+    serials=config['serials'].split(' ')
+    for serial in serials:
+        if serial==format(emparts['serial']):
+            for value in values:
+                #print ("-"+format(value)+('%.4f' % emparts[value]))
+                #print (value)
+                file = open("/run/shm/em-"+format(serial)+"-"+format(value), "w")
+                file.write('%.4f' % emparts[value])
+                file.close()
 
-
-from features.smafeature import smafeature
-class feature(smafeature):
-    def __init__(self):
-        super().__init__()
-        #declare your own thins
-        print("initialisation of feature sample")
-    def run (self,emparts):
-        # my configs
-        #config=self.getconfig()
-        # do something
-        print(('%.4f' % emparts['pregard']))
-        #serial=format(emparts['serial'])
-    def cleanup(self):
-        print("cleanup housekeeping of feature... nothing to do @cleanup")
+def stopping(emparts,config):
+    print("quitting")
+    #close files

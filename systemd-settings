@@ -17,3 +17,13 @@ PIDFile=/var/run/smaemd.pid
 
 [Install]
 WantedBy=multi-user.target
+
+
+Soll Type = simple // forking = für forkende Daemons
+exec start = Pfad zu python start
+exec stop = pfad zu python script mit option zum killen
+
+--Parameters....
+  /run/shm/em-status
+  PIDFile
+  

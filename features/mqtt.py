@@ -1,0 +1,129 @@
+"""
+    Send SMA values to mqtt broker.
+
+    2018-12-23 Tommi2Day
+
+    Configuration:
+
+    [FEATURE-mqtt]
+    # MQTT broker details
+
+    mqtthost=mqtt
+    mqttport=1883
+    #mqttuser=
+    #mqttpass=
+
+    #mqttf topic and provided data ields
+    mqttfields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus
+    #topic will be exted3ed with serial
+    mqtttopic=SMA-EM/status
+
+    # How frequently to send updates over (defaults to 20 sec)
+    min_update=5
+
+    #debug output
+    debug=0
+
+"""
+
+import paho.mqtt.client as mqtt
+import platform
+import json
+import time
+
+
+mqtt_last_update = 0
+mqtt_debug = 0
+
+def run(emparts,config):
+    global mqtt_last_update
+    global mqtt_debug
+
+
+    # Only update every X seconds
+    if time.time() < mqtt_last_update + int(config.get('min_update', 20)):
+        if (mqtt_debug > 1):
+            print("mqtt: data skipping")
+        return
+
+    # prepare mqtt settings
+    mqtthost = config.get('mqtthost', 'mqtt')
+    mqttport = config.get('mqttport', 1883)
+    mqttuser = config.get('mqttuser', None)
+    mqttpass = config.get('mqttpass', None)
+    mqtttopic = config.get('mqtttopic',"SMA-EM/status")
+    mqttfields = config.get('mqttfields', 'pregard,psurplus')
+
+    # mqtt client settings
+    myhostname = platform.node()
+    mqtt_clientID = 'SMA-EM@' + myhostname
+    client = mqtt.Client(mqtt_clientID)
+    if None not in [mqttuser,mqttpass]:
+        client.username_pw_set(username=mqttuser, password=mqttpass)
+
+    #last aupdate
+    mqtt_last_update = time.time()
+
+
+    serial = emparts['serial']
+    data = {}
+    for f in mqttfields.split(','):
+        data[f] = emparts[f]
+
+    #add pv data
+    try:
+        #add summ value to
+        from features.pvdata import pv_data
+        pvpower=pv_data.get("AC Power",0)
+        if pvpower is None: pvpower = 0
+        pregard=emparts.get('pregard',0)
+        psurplus=emparts.get('psurplus',0)
+        pusage=pvpower+pregard-psurplus
+        data['pvsum']=pvpower
+        data['pusage']=pusage
+    except:
+        pv_data = None
+        pass
+
+
+    data['timestamp']=mqtt_last_update
+    payload=json.dumps(data)
+    topic=mqtttopic+'/'+str(serial)
+    try:
+            # mqtt connect
+            client.connect(str(mqtthost), int(mqttport))
+            client.on_publish = on_publish
+            client.publish(topic, payload)
+            if mqtt_debug > 0:
+                print("mqtt: sma-em data published %s:%s" % (
+                    format(time.strftime("%H:%M:%S", time.localtime(mqtt_last_update))),payload))
+
+            #pvoption
+            mqttpvtopic = config.get('pvtopic', None)
+            if None not in [pv_data,mqttpvtopic]  :
+                if pv_data is not None:
+                    pvserial = pv_data.get("serial")
+                    pvtopic=mqttpvtopic+'/'+str(pvserial)
+                    payload=json.dumps(pv_data)
+                    client.publish(pvtopic, payload)
+                    if mqtt_debug > 0:
+                        print("mqtt: sma-pv data published %s:%s" % (
+                            format(time.strftime("%H:%M:%S", time.localtime(mqtt_last_update))),payload))
+
+    except Exception as e:
+            print("mqtt: Error publishing")
+            print(e)
+            pass
+
+
+
+def stopping(emparts,config):
+    pass
+
+def on_publish(client,userdata,result):
+    pass
+
+def config(config):
+    global mqtt_debug
+    mqtt_debug=int(config.get('debug', 0))
+    print('mqtt: feature enabled')

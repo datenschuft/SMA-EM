@@ -18,19 +18,23 @@
  *
  */
 """
-import sys, time
+import sys, time,os
 from daemon3x import daemon3x
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 import smaem
 import socket
 import struct
 
-
 #read configuration
-parser = SafeConfigParser()
-parser.read('/etc/smaemd/config')
+parser = ConfigParser()
+#alternate config locations
+parser.read(['/etc/smaemd/config','config'])
+try:
+	smaemserials=parser.get('SMA-EM', 'serials')
+except:
+	print('Cannot find base config entry SMA-EM serials')
+	sys.exit(1)
 
-smaemserials=parser.get('SMA-EM', 'serials')
 serials=smaemserials.split(' ')
 #smavalues=parser.get('SMA-EM', 'values')
 #values=smavalues.split(' ')
@@ -40,6 +44,16 @@ MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
 MCAST_PORT = int(parser.get('DAEMON', 'mcastport'))
 features=parser.get('SMA-EM', 'features')
 features=features.split(' ')
+statusdir=''
+try:
+	statusdir=parser.get('DAEMON','statusdir')
+except:
+	statusdir="/run/shm/"
+
+if os.path.isdir(statusdir):
+	statusfile=statusdir+"em-status"
+else:
+	statusfile = "em-status"
 
 
 import importlib
@@ -50,7 +64,7 @@ featurecounter=0
 for feature in features:
     #print ('import ' + feature + '.py')
     featureitem={}
-    featureitem={'name':feature}
+    featureitem = {'name': feature}
     try:
        featureitem['feature'] = importlib.import_module('features.' + feature)
     except (ImportError, FileNotFoundError, TypeError):
@@ -62,6 +76,11 @@ for feature in features:
     except:
        print('feature '+feature+ ' not configured')
        sys.exit()
+    try:
+		#run config action, if any
+       featureitem['feature'].config(featureitem['config'])
+    except:
+       pass
     featurelist[featurecounter]=featureitem
     featurecounter += 1
 
@@ -83,28 +102,32 @@ class MyDaemon(daemon3x):
 			try:
 				mreq = struct.pack("4s4s", socket.inet_aton(MCAST_GRP), socket.inet_aton(ipbind))
 				sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-				file = open("/run/shm/em-status", "w")
+				file = open(statusfile, "w")
 				file.write('multicastgroup connected')
 				file.close()
 				socketconnected = True
 			except BaseException:
 				print('could not connect to mulicast group... rest a bit and retry')
-				file = open("/run/shm/em-status", "w")
+				file = open(statusfile, "w")
 				file.write('could not connect to mulicast group... rest a bit and retry')
 				file.close()
 				time.sleep(5)
 		emparts = {}
 		while True:
 			#getting sma values
-			emparts=smaem.readem(sock)
-			for serial in serials:
-				# process only known sma serials
-				if serial==format(emparts['serial']):
-					# running all enabled features
-					for featurenr in featurelist:
-						#print('>>> starting '+featurelist[featurenr]['name'])
-						featurelist[featurenr]['feature'].run(emparts,featurelist[featurenr]['config'])
-
+			try:
+				emparts=smaem.readem(sock)
+				for serial in serials:
+					# process only known sma serials
+					if serial==format(emparts['serial']):
+						# running all enabled features
+						for featurenr in featurelist:
+							#print('>>> starting '+featurelist[featurenr]['name'])
+							featurelist[featurenr]['feature'].run(emparts,featurelist[featurenr]['config'])
+			except Exception as e:
+				print("Daemon: Exception occured")
+				print(e)
+				pass
 #Daemon - Coding
 if __name__ == "__main__":
 	daemon = MyDaemon(pidfile)
@@ -114,7 +137,7 @@ if __name__ == "__main__":
 		elif 'stop' == sys.argv[1]:
 			for featurenr in featurelist:
 				print('>>> stopping '+featurelist[featurenr]['name'])
-				featurelist[featurenr]['feature'].stopping(emparts,featurelist[featurenr]['config'])
+				featurelist[featurenr]['feature'].stopping({},featurelist[featurenr]['config'])
 			daemon.stop()
 		elif 'restart' == sys.argv[1]:
 			daemon.restart()

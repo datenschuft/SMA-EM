@@ -19,6 +19,8 @@
  *  You should have received a copy of the GNU General Public License along with this program;
  *  if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * 2018-12-22 Tommi2Day small enhancements
+ *
  */
 """
 
@@ -27,7 +29,7 @@ import sys
 import smaem
 import socket
 import struct
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 # clean exit
 def abortprogram(signal,frame):
@@ -41,10 +43,15 @@ signal.signal(signal.SIGINT, abortprogram)
 # listen to the Multicast; SMA-Energymeter sends its measurements to 239.12.255.254:9522
 
 #read configuration
-parser = SafeConfigParser()
-parser.read('/etc/smaemd/config')
+parser = ConfigParser()
+#alternate config locations
+parser.read(['/etc/smaemd/config','config'])
+try:
+    smaemserials=parser.get('SMA-EM', 'serials')
+except:
+    print('Cannot find base config entry SMA-EM serials')
+    sys.exit(1)
 
-smaemserials=parser.get('SMA-EM', 'serials')
 serials=smaemserials.split(' ')
 #smavalues=parser.get('SMA-EM', 'values')
 #values=smavalues.split(' ')

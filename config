@@ -6,7 +6,7 @@ serials=3002133445
 # features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
 # list of features to load/run
 #features=simplefswriter sample pvdata mqtt remotedebug symcon influxdb
-features=mqtt-single
+features=mqtt
 
 [DAEMON]
 pidfile=/run/smaemd.pid
@@ -33,7 +33,7 @@ statusdir=
 [FEATURE-sample]
 nothing=here
 
-[FEATURE-mqtt-single]
+[FEATURE-mqtt]
 # MQTT broker details
 mqtthost=homeserver
 mqttport=1883
@@ -43,7 +43,7 @@ mqttfields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3sur
 #topic will be exted3ed with serial
 mqtttopic=SMA-EM/status
 # publish all values as single topics (0 or 1)
-publish_single=0
+publish_single=1
 # How frequently to send updates over (defaults to 20 sec)
 min_update=30
 #debug output

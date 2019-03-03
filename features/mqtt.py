@@ -57,6 +57,7 @@ def run(emparts,config):
     mqttpass = config.get('mqttpass', None)
     mqtttopic = config.get('mqtttopic',"SMA-EM/status")
     mqttfields = config.get('mqttfields', 'pregard,psurplus')
+    publish_single = int(config.get('publish_single',0))
 
     # mqtt client settings
     myhostname = platform.node()
@@ -99,12 +100,12 @@ def run(emparts,config):
             client.on_publish = on_publish
             client.publish(topic, payload)
             # publish each value as separate topic
-            if publish_single = 1:
+            if publish_single == 1:
                 for item in data.keys():
                     itemtopic=topic+'/'+item
                     if mqtt_debug > 0:
                         print("mqtt: publishing %s:%s" % (itemtopic,data[item]) )
-                    client.publish(itemtopic,data[item])
+                    client.publish(itemtopic,str(data[item]))
             if mqtt_debug > 0:
                 print("mqtt: sma-em data published %s:%s" % (
                     format(time.strftime("%H:%M:%S", time.localtime(mqtt_last_update))),payload))
@@ -115,7 +116,6 @@ def run(emparts,config):
                 if pv_data is not None:
                     pvserial = pv_data.get("serial")
                     pvtopic=mqttpvtopic+'/'+str(pvserial)
-
                     payload=json.dumps(pv_data)
                     client.publish(pvtopic, payload)
                     if mqtt_debug > 0:
@@ -133,6 +133,7 @@ def stopping(emparts,config):
     pass
 
 def on_publish(client,userdata,result):
+    time.sleep(0.01) # experimental value, seems to work...
     pass
 
 def config(config):

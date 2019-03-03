@@ -2,6 +2,7 @@
     Send SMA values to mqtt broker.
 
     2018-12-23 Tommi2Day
+    2019-03-02 david-m-m
 
     Configuration:
 
@@ -17,6 +18,9 @@
     mqttfields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus
     #topic will be exted3ed with serial
     mqtttopic=SMA-EM/status
+
+    # publish all values additionally as single topics (0 or 1)
+    publish_single=1
 
     # How frequently to send updates over (defaults to 20 sec)
     min_update=5
@@ -94,6 +98,13 @@ def run(emparts,config):
             client.connect(str(mqtthost), int(mqttport))
             client.on_publish = on_publish
             client.publish(topic, payload)
+            # publish each value as separate topic
+            if publish_single = 1:
+                for item in data.keys():
+                    itemtopic=topic+'/'+item
+                    if mqtt_debug > 0:
+                        print("mqtt: publishing %s:%s" % (itemtopic,data[item]) )
+                    client.publish(itemtopic,data[item])
             if mqtt_debug > 0:
                 print("mqtt: sma-em data published %s:%s" % (
                     format(time.strftime("%H:%M:%S", time.localtime(mqtt_last_update))),payload))
@@ -104,6 +115,7 @@ def run(emparts,config):
                 if pv_data is not None:
                     pvserial = pv_data.get("serial")
                     pvtopic=mqttpvtopic+'/'+str(pvserial)
+
                     payload=json.dumps(pv_data)
                     client.publish(pvtopic, payload)
                     if mqtt_debug > 0:

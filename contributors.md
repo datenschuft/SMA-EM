@@ -22,3 +22,8 @@ SMA-EM-Daemon contributors
   * "remotedebug" to allow remote debug from PyCharm
   * "influxdb" and sample grafana dashboard based on this plugin
   * "symcon" to supply SMA EM/HOM and PV data to "IP-Symcon" 
+
+* **[david-m-m](https://github.com/david-m-m)**
+
+  * rewrite SMA HM2.0 datagram parser
+  * parse SMA EMETER datagrams

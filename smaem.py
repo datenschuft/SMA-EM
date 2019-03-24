@@ -3,7 +3,7 @@
  * by Wenger Florian 2015-11-12
  * wenger@unifox.at
  *
- *
+ * by david-m-m 2019-03-20
  *
  *  this software is released under GNU General Public License, version 2.
  *  This program is free software;
@@ -18,17 +18,16 @@
  *
  */
 """
+
 #import socket
 import struct
 import binascii
 import sys
-
-
+from speedwiredecoder import * 
 
 # listen to the Multicast; SMA-Energymeter sends its measurements to 239.12.255.254:9522
 #MCAST_GRP = '239.12.255.254'
 #MCAST_PORT = 9522
-
 
 # function to transform HEX to DEC
 def hex2dec(s):
@@ -41,15 +40,12 @@ def abortprogram(signal,frame):
     print('STRG + C = end program')
     sys.exit(0)
 
-
-
 # prepare listen to socket-Multicast
 #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 #sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 #sock.bind(('', MCAST_PORT))
 #mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
 #sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-
 
 def readem(sock):
   smainfo=sock.recv(600)
@@ -60,6 +56,9 @@ def readem(sock):
   # regard/Bezug=getting energy from main grid
   # surplus/surplus=putting energy to the main grid
 
+  emparts=decode_speedwire(smainfo)
+
+  return emparts
 
   smaserial=hex2dec(smainfoasci[40:48])
   pregard=hex2dec(smainfoasci[64:72])/10

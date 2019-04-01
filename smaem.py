@@ -29,11 +29,6 @@ from speedwiredecoder import *
 #MCAST_GRP = '239.12.255.254'
 #MCAST_PORT = 9522
 
-# function to transform HEX to DEC
-def hex2dec(s):
-    """return the integer value of a hexadecimal string s"""
-    return int(s, 16)
-
 # clean exit
 def abortprogram(signal,frame):
     # Housekeeping -> nothing to cleanup
@@ -49,7 +44,6 @@ def abortprogram(signal,frame):
 
 def readem(sock):
   smainfo=sock.recv(600)
-  smainfoasci=binascii.b2a_hex(smainfo)
 
   # split the received message to seperate vars
 

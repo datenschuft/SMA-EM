@@ -27,3 +27,4 @@ SMA-EM-Daemon contributors
 
   * rewrite SMA HM2.0 datagram parser
   * parse SMA EMETER datagrams
+  * enhance mqtt module to export topics for all metrics, works with [mqtt_exporter](https://github.com/bendikwa/mqtt_exporter)

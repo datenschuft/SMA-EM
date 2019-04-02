@@ -15,7 +15,7 @@
     #mqttpass=
 
     #mqttf topic and provided data ields
-    mqttfields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus
+    mqttfields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
     #topic will be exted3ed with serial
     mqtttopic=SMA-EM/status
 
@@ -56,7 +56,7 @@ def run(emparts,config):
     mqttuser = config.get('mqttuser', None)
     mqttpass = config.get('mqttpass', None)
     mqtttopic = config.get('mqtttopic',"SMA-EM/status")
-    mqttfields = config.get('mqttfields', 'pregard,psurplus')
+    mqttfields = config.get('mqttfields', 'pconsume,psupply')
     publish_single = int(config.get('publish_single',0))
 
     # mqtt client settings
@@ -81,9 +81,9 @@ def run(emparts,config):
         from features.pvdata import pv_data
         pvpower=pv_data.get("AC Power",0)
         if pvpower is None: pvpower = 0
-        pregard=emparts.get('pregard',0)
-        psurplus=emparts.get('psurplus',0)
-        pusage=pvpower+pregard-psurplus
+        pconsume=emparts.get('pconsume',0)
+        psupply=emparts.get('psupply',0)
+        pusage=pvpower+pconsume-psupply
         data['pvsum']=pvpower
         data['pusage']=pusage
     except:

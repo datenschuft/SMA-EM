@@ -10,9 +10,9 @@ see https://github.com/datenschuft/SMA-EM
 /*
 [SMA-EM]
 # serials of sma-ems the daemon should take notice
-# seperated by space 
+# seperated by space
 # MUST SET EXACT
-serials=30028xxxx 
+serials=30028xxxx
 # features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
 # list of features to load/run
 features=symcon
@@ -36,12 +36,12 @@ emhook=/hook/smaem
 pvhook=/hook/smawr
 timeout=5
 
-#authorisation must match $hook_user and $hook_password 
+#authorisation must match $hook_user and $hook_password
 user=Symcon
 password=SMA-EMdata
 
 #fields should match $vartypes config
-fields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus,psurpluscounter,pregardcounter
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply,psupplycounter,pconsumecounter
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3,Status
 
 # How frequently to send update in sec (defaults to 20 sec)
@@ -65,19 +65,19 @@ $hook_password='SMA-EMdata';
 $cat='SMA';
 $prefix='SMA-EM';
 $autocreate=true;
-$test='{"p3surplus": 0.0, "p2regard": 139.9, "p1surplus": 0.0, "serial": "300284xxx", "sender": "raspberry", "p3regard": 629.9, "pregard": 854.0, "timestamp": 1545600356.2988641, "pregardcounter": 1748.434, "p2surplus": 0.0, "p1regard": 84.2, "psurpluscounter": 573.3576, "psurplus": 0.0}';
+$test='{"p3supply": 0.0, "p2consume": 139.9, "p1supply": 0.0, "serial": "300284xxx", "sender": "raspberry", "p3consume": 629.9, "pconsume": 854.0, "timestamp": 1545600356.2988641, "pconsumecounter": 1748.434, "p2supply": 0.0, "p1consume": 84.2, "psupplycounter": 573.3576, "psupply": 0.0}';
 $vartypes=array(  'serial'=>array('type'=>3,'profile'=>''),
-    'pregard'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'p1regard'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'p2regard'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'p3regard'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'psurplus'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'psurplus'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'p1surplus'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'p2surplus'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'p3surplus'=>array('type'=>2,'profile'=>'~Watt.14490'),
-    'pregardcounter'=>array('type'=>2,'profile'=>'~Electricity'),
-    'psurpluscounter'=>array('type'=>2,'profile'=>'~Electricity'),
+    'pconsume'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'p1consume'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'p2consume'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'p3consume'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'psupply'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'psupply'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'p1supply'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'p2supply'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'p3supply'=>array('type'=>2,'profile'=>'~Watt.14490'),
+    'pconsumecounter'=>array('type'=>2,'profile'=>'~Electricity'),
+    'psupplycounter'=>array('type'=>2,'profile'=>'~Electricity'),
     'timestamp'=>array('type'=>1,'profile'=>'~UnixTimestamp')
 );
 //auth only if called by webhook
@@ -125,7 +125,7 @@ foreach ($fields as $f) {
         $ident=fix_ident($f);
         SetValue($varids["$ident"]['id'],$data->{"$f"});
     }
-    
+
 }
 return;
 
@@ -133,7 +133,7 @@ return;
 
 /**
 * function fix_ident
-* remove unwanted chars from name for ips_setIdent 
+* remove unwanted chars from name for ips_setIdent
 * @param string $name
 * @returns string
 */
@@ -267,4 +267,3 @@ function list_cats($catname) {
     }
     return $ret;
 }
-

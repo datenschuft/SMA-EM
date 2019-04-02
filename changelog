@@ -1,5 +1,9 @@
 SMA-EM-Daemon changelog-File
 
+20190402001
+    Cosmetics / variables naming #14
+    replaced pregard with consume and surplus with supply
+
 20180223001
     Merge branch 'Tommi2Day-master' https://github.com/datenschuft/SMA-EM/pull/13
     thanks to Tommi2Day

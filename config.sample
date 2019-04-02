@@ -27,7 +27,7 @@ statusdir=
 # list serials simplefswriter notice
 serials=30028xxxxx
 # measurement vars simplefswriter should write to filesystem (only from smas with serial in serials)
-values=pregard psurplus qsurplus ssurplus
+values=pconsume psupply qsupply ssupply
 statusdir=
 
 [FEATURE-sample]
@@ -39,7 +39,7 @@ mqtthost=mqtt
 mqttport=1883
 #mqttuser=
 #mqttpass=
-mqttfields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus
+mqttfields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 #topic will be exted3ed with serial
 mqtttopic=SMA-EM/status
 # publish all values as single topics (0 or 1)
@@ -63,7 +63,7 @@ timeout=5
 user=Symcon
 password=SMA-EMdata
 
-fields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus,psurpluscounter,pregardcounter
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply,psupplycounter,pconsumecounter
 emhook=/hook/smaem
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3,Status
 pvhook=/hook/smawr
@@ -88,7 +88,7 @@ min_update=30
 debug=0
 #emdata
 measurement=SMAEM
-fields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 
 #pvdata
 pvmeasurement=SMAWR

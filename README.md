@@ -3,7 +3,7 @@
 ## SMA Energymeter measurement
 sma-em-measurement.py: Python3 loop display SMA Energymeter measurement values
 
-sma-daemon.py: Python3 daemon writing regard and surplus values to /run/shm/em-[serial]-[value]
+sma-daemon.py: Python3 daemon writing consume and supply values to /run/shm/em-[serial]-[value]
 
 ## Requirements
 python3
@@ -44,7 +44,7 @@ mcastport=9522
 # list serials simplefswriter notice
 serials=1900204522
 # measurement vars simplefswriter should write to filesystem (only from smas with serial in serials)
-values=pregard psurplus qsurplus ssurplus
+values=pconsume psupply qsupply ssupply
 
 [FEATURE-sample]
 nothing=here

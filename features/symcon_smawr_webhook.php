@@ -41,7 +41,7 @@ user=Symcon
 password=SMA-EMdata
 
 #fields should match $vartypes config
-fields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus,psurpluscounter,pregardcounter
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply,psupplycounter,pconsumecounter
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3,Status
 
 # How frequently to send update in sec (defaults to 20 sec)
@@ -266,4 +266,3 @@ function list_cats($catname) {
     }
     return $ret;
 }
-

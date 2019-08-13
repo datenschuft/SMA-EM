@@ -20,6 +20,7 @@
  *  if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * 2018-12-22 Tommi2Day small enhancements
+ * 2019-08-13 datenschuft run without config
  *
  */
 """
@@ -40,30 +41,22 @@ def abortprogram(signal,frame):
 # abort-signal
 signal.signal(signal.SIGINT, abortprogram)
 
-# listen to the Multicast; SMA-Energymeter sends its measurements to 239.12.255.254:9522
 
 #read configuration
 parser = ConfigParser()
-#alternate config locations
+#default values
+smaserials = ""
+ipbind = '0.0.0.0'
+MCAST_GRP = '239.12.255.254'
+MCAST_PORT = 9522
 parser.read(['/etc/smaemd/config','config'])
 try:
     smaemserials=parser.get('SMA-EM', 'serials')
+    ipbind=parser.get('DAEMON', 'ipbind')
+    MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
+    MCAST_PORT = int(parser.get('DAEMON', 'mcastport'))
 except:
-    print('Cannot find base config entry SMA-EM serials')
-    sys.exit(1)
-
-serials=smaemserials.split(' ')
-#smavalues=parser.get('SMA-EM', 'values')
-#values=smavalues.split(' ')
-pidfile=parser.get('DAEMON', 'pidfile')
-ipbind=parser.get('DAEMON', 'ipbind')
-MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
-MCAST_PORT = int(parser.get('DAEMON', 'mcastport'))
-
-if MCAST_GRP == "":
-    MCAST_GRP = '239.12.255.254'
-if MCAST_PORT == 0:
-    MCAST_PORT = 9522
+    print('Cannot find config /etc/smaemd/config... using defaults')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

@@ -105,12 +105,14 @@ def decode_speedwire(datagram):
       if datatype=='actual':
         value=int.from_bytes( datagram[position+4:position+8], byteorder='big' )
         position+=8
-        emparts[sma_channels[measurement][1]]=value*sma_units[sma_channels[measurement][2]]
+        if measurement in sma_channels.keys():
+          emparts[sma_channels[measurement][1]]=value*sma_units[sma_channels[measurement][2]]
       # counter values
       elif datatype=='counter':
         value=int.from_bytes( datagram[position+4:position+12], byteorder='big' )
         position+=12
-        emparts[sma_channels[measurement][1]+'counter']=value*sma_units[sma_channels[measurement][3]]*0.001
+        if measurement in sma_channels.keys():
+          emparts[sma_channels[measurement][1]+'counter']=value*sma_units[sma_channels[measurement][3]]*0.001
       else:
         position+=8
 

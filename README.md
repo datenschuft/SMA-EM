@@ -1,9 +1,15 @@
 # SMA-EM
 
-## SMA Energymeter measurement
+## SMA Energymeter / Homemanager measurement
 sma-em-measurement.py: Python3 loop display SMA Energymeter measurement values
 
 sma-daemon.py: Python3 daemon writing consume and supply values to /run/shm/em-[serial]-[value]
+
+```
+# HINT #
+Sma homemanager version 2.3.4R added 8 Byte of measurement data.
+This version trys to detect the measurement values on obis ids, so it should be save if new values were added or removed.
+```
 
 ## Requirements
 python3
@@ -75,3 +81,9 @@ systemctl enable smaemd.service
 systemctl start smaemd.service
 ```
 feel lucky and read /run/shm/em-<serial>-<value>
+
+
+
+## Testing
+sma-em-capture-package - trys to capture a SMA-EM or SMA-homemanager Datagram and display hex and ascii package-info and all recogniced measurement values.
+Cloud be helpful on package/software changes.

@@ -21,16 +21,18 @@
  *
  * 2018-12-22 Tommi2Day small enhancements
  * 2019-08-13 datenschuft run without config
+ * 2020-01-04 datenschuft changes to tun with speedwiredecoder
  *
  */
 """
 
 import signal
 import sys
-import smaem
+#import smaem
 import socket
 import struct
 from configparser import ConfigParser
+from speedwiredecoder import *
 
 # clean exit
 def abortprogram(signal,frame):
@@ -70,8 +72,7 @@ except BaseException:
 # processing received messages
 while True:
   emparts = {}
-  emparts=smaem.readem(sock)
-  #
+  emparts=decode_speedwire(sock.recv(608))
   # Output...
   # don't know what P,Q and S means:
   # http://en.wikipedia.org/wiki/AC_power or http://de.wikipedia.org/wiki/Scheinleistung
@@ -84,18 +85,21 @@ while True:
   print ('S: consume:{}VA {}kVAh supply:{}VA {}VAh'.format(emparts['sconsume'],emparts['sconsumecounter'],emparts['ssupply'],emparts['ssupplycounter']))
   print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['qconsume'],emparts['qconsumecounter'],emparts['qsupply'],emparts['qsupplycounter']))
   print ('cos phi:{}°'.format(emparts['cosphi']))
+  if emparts['speedwire-version']=="2.3.4.R|020304":
+    print ('frequency:{}Hz'.format(emparts['frequency']))
   print ('----L1----')
   print ('P: consume:{}W {}kWh supply:{}W {}kWh'.format(emparts['p1consume'],emparts['p1consumecounter'],emparts['p1supply'],emparts['p1supplycounter']))
   print ('S: consume:{}VA {}kVAh supply:{}VA {}kVAh'.format(emparts['s1consume'],emparts['s1consumecounter'],emparts['s1supply'],emparts['s1supplycounter']))
   print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q1consume'],emparts['q1consumecounter'],emparts['q1supply'],emparts['q1supplycounter']))
-  print ('U: {}V thd:{}% cos phi:{}°'.format(emparts['v1'],emparts['thd1'],emparts['cosphi1']))
+  print ('U: {}V I:{}A cos phi:{}°'.format(emparts['u1'],emparts['i1'],emparts['cosphi1']))
   print ('----L2----')
   print ('P: consume:{}W {}kWh supply:{}W {}kWh'.format(emparts['p2consume'],emparts['p2consumecounter'],emparts['p2supply'],emparts['p2supplycounter']))
   print ('S: consume:{}VA {}kVAh supply:{}VA {}kVAh'.format(emparts['s2consume'],emparts['s2consumecounter'],emparts['s2supply'],emparts['s2supplycounter']))
   print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q2consume'],emparts['q2consumecounter'],emparts['q2supply'],emparts['q2supplycounter']))
-  print ('U: {}V thd:{}% cos phi:{}°'.format(emparts['v2'],emparts['thd2'],emparts['cosphi2']))
+  print ('U: {}V I:{}A cos phi:{}°'.format(emparts['u2'],emparts['i2'],emparts['cosphi2']))
   print ('----L3----')
   print ('P: consume:{}W {}kWh supply:{}W {}kWh'.format(emparts['p3consume'],emparts['p3consumecounter'],emparts['p3supply'],emparts['p3supplycounter']))
   print ('S: consume:{}VA {}kVAh supply:{}VA {}kVAh'.format(emparts['s3consume'],emparts['s3consumecounter'],emparts['s3supply'],emparts['s3supplycounter']))
   print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q3consume'],emparts['q3consumecounter'],emparts['q3supply'],emparts['q3supplycounter']))
-  print ('U: {}V thd:{}% cos phi:{}°'.format(emparts['v3'],emparts['thd3'],emparts['cosphi3']))
+  print ('U: {}V I:{}A cos phi:{}°'.format(emparts['u3'],emparts['i3'],emparts['cosphi3']))
+  print ('Version: {}'.format(emparts['speedwire-version']))

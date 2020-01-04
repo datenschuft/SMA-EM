@@ -16,14 +16,16 @@
  *  You should have received a copy of the GNU General Public License along with this program;
  *  if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * 2020-01-04 datenschuft changes to tun with speedwiredecoder
  */
 """
 import sys, time,os
 from daemon3x import daemon3x
 from configparser import ConfigParser
-import smaem
+#import smaem
 import socket
 import struct
+from speedwiredecoder import *
 
 #read configuration
 parser = ConfigParser()
@@ -116,7 +118,8 @@ class MyDaemon(daemon3x):
 		while True:
 			#getting sma values
 			try:
-				emparts=smaem.readem(sock)
+				#emparts=smaem.readem(sock)
+				emparts=decode_speedwire(sock.recv(608))
 				for serial in serials:
 					# process only known sma serials
 					if serial==format(emparts['serial']):

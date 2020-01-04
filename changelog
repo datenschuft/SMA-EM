@@ -1,5 +1,9 @@
 SMA-EM-Daemon changelog-File
 
+20200104001
+    fixed issue 21 new datagramsize with homemanager version 2.3.4.R
+    package split based on coding pull request 18 (david-m-m)
+
 20190402001
     Cosmetics / variables naming #14
     replaced pregard with consume and surplus with supply

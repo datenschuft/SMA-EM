@@ -23,7 +23,7 @@
     timeout=5
     user=
     password=
-    fields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus
+    fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 
     # How frequently to send updates over (defaults to 20 sec)
     min_update=30
@@ -65,7 +65,7 @@ def run(emparts,config):
     user = config.get('user', None)
     password = config.get('password',None )
     mesurement= config.get('measurement','SMAEM' )
-    fields = config.get('fields', 'pregard,psurplus')
+    fields = config.get('fields', 'pconsume,psupply')
     pvfields=config.get('pvfields')
     influx=None
     #connect to db, create one if needed
@@ -121,9 +121,9 @@ def run(emparts,config):
         from features.pvdata import pv_data
         pvpower = pv_data.get("AC Power")
         if pvpower is None: pvpower=0
-        pregard = emparts.get('pregard', 0)
-        psurplus = emparts.get('psurplus', 0)
-        pusage = pvpower + pregard - psurplus
+        pconsume = emparts.get('pconsume', 0)
+        psupply = emparts.get('psupply', 0)
+        pusage = pvpower + pconsume - psupply
         data['pvpower'] = pvpower
         data['pusage'] = pusage
     except:
@@ -187,4 +187,3 @@ def config(config):
     global influx_debug
     influx_debug=int(config.get('debug', 0))
     print('influxdb: feature enabled')
-

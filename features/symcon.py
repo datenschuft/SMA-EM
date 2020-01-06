@@ -14,7 +14,7 @@
     timeout=5
     user=
     password=
-    fields=pregard,psurplus,p1regard,p2regard,p3regard,p1surplus,p2surplus,p3surplus
+    fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
     pvfields=AC Power,AC Voltage,grid frequency,DC Power,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
 
     # How frequently to send updates over (defaults to 20 sec)
@@ -48,7 +48,7 @@ def run(emparts,config):
     emhook = config.get('emhook','/hook/smaem')
     user = config.get('user', None)
     password = config.get('password', None)
-    fields = config.get('fields', 'pregard,psurplus')
+    fields = config.get('fields', 'pconsume,psupply')
 
     # mqtt client settings
     myhostname = platform.node()
@@ -181,4 +181,3 @@ def config(config):
     global symcon_debug
     symcon_debug=int(config.get('debug', 0))
     print('symcon: feature enabled')
-

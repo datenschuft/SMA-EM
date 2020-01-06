@@ -110,7 +110,7 @@
             [
               {
                 "params": [
-                  "pregard"
+                  "pconsume"
                 ],
                 "type": "field"
               },
@@ -120,7 +120,7 @@
               },
               {
                 "params": [
-                  "regard"
+                  "consume"
                 ],
                 "type": "alias"
               }
@@ -128,7 +128,7 @@
             [
               {
                 "params": [
-                  "psurplus"
+                  "psupply"
                 ],
                 "type": "field"
               },
@@ -138,7 +138,7 @@
               },
               {
                 "params": [
-                  "surplus"
+                  "supply"
                 ],
                 "type": "alias"
               }

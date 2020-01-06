@@ -9,7 +9,7 @@
     min_update=30
 
     # List of items to send over. Each item should contain a string like <SMA serial>:<domoticz ID>,<SMA serial 2>:<domoticz ID 2>, ...
-    pregard=1234567869:73
+    pconsume=1234567869:73
     v1=1234567869:72
 """
 
@@ -40,7 +40,7 @@ def run(emparts,config):
             continue
 
         url = "%s?type=command&param=udevice&idx=%s&nvalue=0&svalue=" % (config['api'], dom_ids[serial])
-        if key in ['pregard', 'p1regard', 'p2regard', 'p3regard']:
+        if key in ['pconsume', 'p1consume', 'p2consume', 'p3consume']:
             url += "%0.2f;%0.2f" % (emparts[key], emparts[key + "counter"] * 1000)
         else:
             url += "%0.2f" % emparts[key]

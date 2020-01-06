@@ -36,11 +36,14 @@ def run(emparts,config):
         if serial==format(emparts['serial']):
             ts=(format(time.strftime("%H:%M:%S", time.localtime())))
             for value in values:
-                if sw_debug >0:
-                    print ('simplewriter: '+ts+" - "+format(value)+': '+('%.4f' % emparts[value]))
-                file = open(statusdir+"em-"+format(serial)+"-"+format(value), "w")
-                file.write('%.4f' % emparts[value])
-                file.close()
+                if value in emparts.keys():
+                    if sw_debug >0:
+                        print ('simplewriter: '+ts+" - "+format(value)+': '+('%.4f' % emparts[value]))
+                    file = open(statusdir+"em-"+format(serial)+"-"+format(value), "w")
+                    file.write('%.4f' % emparts[value])
+                    file.close()
+                elif sw_debug > 0:
+                    print ('simplefswriter: could not find value for '+format(value))
 
 def stopping(emparts,config):
     print("quitting")

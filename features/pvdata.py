@@ -71,7 +71,12 @@ def run(emparts, config):
 
     pv_last_update = time.time()
 
-    pv_data = get_pv_data(config)
+    host = config.get('inv_host')
+    port = config.get('inv_port', 502)
+    modbusid = config.get('inv_modbus', 3)
+    registers = eval(config.get('registers'))
+
+    pv_data = get_pv_data(host, port, modbusid, registers)
     # query
     if pv_data is None:
         if pv_debug > 0:

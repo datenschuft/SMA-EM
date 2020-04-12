@@ -55,7 +55,7 @@ from features.smamodbus import get_pv_data
 
 pv_last_update = 0
 pv_debug = 0
-pv_data = {}
+pv_data = []
 
 
 def run(emparts, config):
@@ -70,22 +70,25 @@ def run(emparts, config):
         return
 
     pv_last_update = time.time()
-
-    host = config.get('inv_host')
-    port = config.get('inv_port', 502)
-    modbusid = config.get('inv_modbus', 3)
     registers = eval(config.get('registers'))
 
-    pv_data = get_pv_data(host, port, modbusid, registers)
+    pv_data = []
+    for inv in eval(config.get('inverters')):
+        host, port, modbusid, manufacturer = inv
+        mdata = get_pv_data(host, int(port), int(modbusid), registers)
+        pv_data.append(mdata)
+
     # query
     if pv_data is None:
         if pv_debug > 0:
             print("PV: no data")
         return
 
-    pv_data['timestamp'] = time.time()
-    if pv_debug > 0:
-        print("PV:" + format(pv_data))
+    timestamp = time.time()
+    for i in pv_data:
+        i['timestamp'] = timestamp
+        if pv_debug > 0:
+            print("PV:" + format(i))
 
 
 def stopping(emparts, config):

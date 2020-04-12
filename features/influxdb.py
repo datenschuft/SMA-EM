@@ -71,7 +71,7 @@ def run(emparts,config):
     influx=None
     #connect to db, create one if needed
     try:
-        influx = InfluxDBClient(host=host, port=port, ssl=ssl, username=user, password=password, timeout=timeout)
+        influx = InfluxDBClient(host=host, port=port, ssl=ssl, verify_ssl=ssl, username=user, password=password, timeout=timeout)
         dbs = influx.get_list_database()
         if influx_debug>1:
             print(dbs)

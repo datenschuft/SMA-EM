@@ -438,7 +438,7 @@ def get_pv_data(config):
             elif myreg[2] == 'FIX1':
                 value = float(interpreted) / 10
             elif myreg[2] == 'UTF8':
-                value = str(interpreted,'UTF-8').rstrip("\x00")
+                value = str(interpreted,'UTF-8',errors='ignore').rstrip("\x00")
             elif myreg[2] == 'ENUM':
                 e=pvenums.get(name,{})
                 value = e.get(interpreted,str(interpreted))

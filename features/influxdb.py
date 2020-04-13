@@ -125,9 +125,10 @@ def run(emparts, config):
     pdirectusage = 0
     try:
         from features.pvdata import pv_data
-        pvpower = 0
         if pv_data != None:
-            pvpower = pv_data.get("AC Power", 0)
+            for inv in pv_data:
+                pvpower += inv.get("AC Power", 0)
+
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
@@ -183,21 +184,26 @@ def run(emparts, config):
     pvmeasurement = config.get('pvmeasurement')
     if None in [pvfields, pv_data, pvmeasurement]: return
 
-    influx_data = {}
-    data = {}
-    influx_data['measurement'] = pvmeasurement
-    influx_data['time'] = now
-    influx_data['tags'] = {}
-    # unly if we have values
-    if pv_data is not None:
-        for f in pvfields.split(','):
-            data[f] = pv_data.get(f)
-            if data[f] is None: data[f]=0.0
-        pvserial = pv_data.get('serial')
-        influx_data['tags']["serial"] = pvserial
+    influx_data = []
+    datapoint={
+            'measurement': pvmeasurement,
+            'time': now
+            }
+    fields = {}
+    for inv in pv_data:
+        # add device IDs as tag columns and remove from data list
+        datapoint['tags'] = {'serial': inv.get('serial')}
+        inv.pop('serial')
 
-    influx_data['fields'] = data
-    points = [influx_data]
+        # only if we have values
+        if pv_data is not None:
+            for f in pvfields.split(','):
+                fields[f] = inv.get(f, 0)
+
+        datapoint['fields'] = fields.copy()
+        influx_data.append(datapoint.copy())
+
+    points = influx_data
 
     # send it
     try:

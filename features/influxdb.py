@@ -187,19 +187,25 @@ def run(emparts, config):
     influx_data = []
     datapoint={
             'measurement': pvmeasurement,
-            'time': now
+            'time': now,
+            'tags': {},
+            'fields': {}
             }
+    taglist = ['serial', 'DeviceID', 'Device Name']
+    tags = {}
     fields = {}
     for inv in pv_data:
-        # add device IDs as tag columns and remove from data list
-        datapoint['tags'] = {'serial': inv.get('serial')}
-        inv.pop('serial')
+        # add tag columns and remove from data list
+        for t in taglist:
+            tags[t] = inv.get(t)
+            inv.pop(t)
 
         # only if we have values
         if pv_data is not None:
             for f in pvfields.split(','):
                 fields[f] = inv.get(f, 0)
 
+        datapoint['tags'] = tags.copy()
         datapoint['fields'] = fields.copy()
         influx_data.append(datapoint.copy())
 

@@ -374,7 +374,28 @@ pvenums = {
         9314: 'PlugwiseCircle',
         9315: 'PlugwiseSting',
         9316: 'SCS-1000',
-        9317: 'SB 5400TL-JP-22'
+        9317: 'SB 5400TL-JP-22',
+        9324: 'SBS1.5-1VL-10',
+        9325: 'SBS2.0-1VL-10',
+        9326: 'SBS2.5-1VL-10',
+        9344: 'STP4.0-3AV-40',
+        9345: 'STP5.0-3AV-40',
+        9346: 'STP6.0-3AV-40',
+        9366: 'STP3.0-3AV-40'
+    },
+    'BatteryState': {
+        303: 'Off',
+        2291: 'Standby',
+        2292: 'Charging',
+        2293: 'Discharging',
+        16777213: 'NA'
+    },
+    'BatteryHealth': {
+        35: 'Fault',
+        303: 'Off',
+        307: 'OK',
+        455: 'Warning',
+        16777213: 'NA'
     }
 }
 

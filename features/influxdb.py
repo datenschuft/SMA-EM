@@ -69,6 +69,7 @@ def run(emparts, config):
     fields = config.get('fields', 'pconsume,psupply')
     pvfields = config.get('pvfields')
     influx = None
+
     # connect to db, create one if needed
     try:
         if ssl == True:
@@ -191,35 +192,33 @@ def run(emparts, config):
     if None in [pvfields, pv_data, pvmeasurement]: return
 
     influx_data = []
-    datapoint={
+    datapoint = {
             'measurement': pvmeasurement,
             'time': now,
             'tags': {},
             'fields': {}
-            }
+    }
     taglist = ['serial', 'DeviceID', 'Device Name']
     tags = {}
     fields = {}
-    for inv in pv_data:
-        # add tag columns and remove from data list
-        for t in taglist:
-            tags[t] = inv.get(t)
-            inv.pop(t)
 
-        # only if we have values
-        if pv_data is not None:
+    if pv_data is not None:
+        for inv in pv_data:
+            # add tag columns and remove from data list
+            for t in taglist:
+                tags[t] = inv.get(t)
+                inv.pop(t)
+
             for f in pvfields.split(','):
                 fields[f] = inv.get(f, 0)
 
-        datapoint['tags'] = tags.copy()
-        datapoint['fields'] = fields.copy()
-        influx_data.append(datapoint.copy())
-
-    points = influx_data
+            datapoint['tags'] = tags.copy()
+            datapoint['fields'] = fields.copy()
+            influx_data.append(datapoint.copy())
 
     # send it
     try:
-        influx.write_points(points, time_precision='s', protocol='json')
+        influx.write_points(influx_data, time_precision='s', protocol='json')
     except InfluxDBClientError as e:
         if influx_debug > 0:
             print('InfluxDBError: %s' % (format(e)))
@@ -230,7 +229,7 @@ def run(emparts, config):
     else:
         if influx_debug > 0:
             print("InfluxDB: pv data published %s:%s" % (
-            format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points)))
+                format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points)))
 
 
 def stopping(emparts, config):

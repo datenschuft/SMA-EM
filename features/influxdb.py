@@ -122,9 +122,10 @@ def run(emparts, config):
     influx_data['time'] = now
     influx_data['tags'] = {}
     influx_data['tags']["serial"] = serial
-
     pvpower = 0
     pdirectusage = 0
+    pbattery = 0
+
     try:
         from features.pvdata import pv_data
 
@@ -133,7 +134,9 @@ def run(emparts, config):
             if inv.get("AC Power") is None:
                 pass
             elif inv.get("DeviceClass") == "Solar Inverter":
-                pvpower += inv.get("AC Power", 0)
+                pvpower += inv.get("AC Power")
+            elif inv.get("DeviceClass") == "Battery Inverter":
+                pbattery += inv.get("AC Power")
 
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
@@ -147,6 +150,7 @@ def run(emparts, config):
         data['pdirectusage'] = pdirectusage
         data['pvpower'] = float(pvpower)
         data['pusage'] = float(pusage)
+        data['pbattery'] = float(pbattery)
     except:
         # Kostal inverter? (pvdata_kostal_json)
         print("except - no sma - inverter")

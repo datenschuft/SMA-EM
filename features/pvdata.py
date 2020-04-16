@@ -83,7 +83,7 @@ def run(emparts, config):
             relevant_registers = eval(config.get('registers'))
         elif device_class == "Battery Inverter":
             relevant_registers = eval(config.get('registers_batt'))
-        else
+        else:
             if (pv_debug > 1):
                 print("pv: unknown device class; skipping")
             pass

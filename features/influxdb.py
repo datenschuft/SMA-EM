@@ -125,13 +125,18 @@ def run(emparts, config):
     pdirectusage = 0
     try:
         from features.pvdata import pv_data
-        if pv_data != None:
-            for inv in pv_data:
+
+        for inv in pv_data:
+            # handle missing data during night hours
+            if inv.get("AC Power") is None:
+                pass
+            elif inv.get("DeviceClass") == "Solar Inverter":
                 pvpower += inv.get("AC Power", 0)
 
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
+
         if pdirectusage is None: pdirectusage=0
         if pvpower > pusage:
             pdirectusage = pusage

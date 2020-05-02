@@ -61,6 +61,7 @@ def run(emparts,config):
     db = config.get('db', 'SMA')
     host = config.get('host', 'influxdb')
     port = int(config.get('port', 8086))
+    ssl = bool(config.get('ssl', 'false'))
     timeout = int(config.get('timeout', 5))
     user = config.get('user', None)
     password = config.get('password',None )
@@ -70,7 +71,7 @@ def run(emparts,config):
     influx=None
     #connect to db, create one if needed
     try:
-        influx = InfluxDBClient(host=host, port=port, username=user, password=password,timeout=timeout)
+        influx = InfluxDBClient(host=host, port=port, ssl=ssl, verify_ssl=ssl, username=user, password=password, timeout=timeout)
         dbs = influx.get_list_database()
         if influx_debug>1:
             print(dbs)

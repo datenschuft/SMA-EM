@@ -18,6 +18,9 @@ time
 configparser (SafeConfigParser)
 signal
 
+```
+apt install python3-pip
+```
 
 ## Configuration
 create a config file in /etc/smaemd/config<br>

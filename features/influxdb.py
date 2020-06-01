@@ -117,6 +117,7 @@ def run(emparts,config):
     influx_data['time'] = now
     influx_data['tags']={}
     influx_data['tags']["serial"]=serial
+
     pvpower=0
     try:
         from features.pvdata import pv_data
@@ -128,7 +129,20 @@ def run(emparts,config):
         data['pvpower'] = pvpower
         data['pusage'] = pusage
     except:
-        pv_data = None
+        #Kostal inverter? (pvdata_kostal_json)
+        print("except - no sma - inverter")
+        try:
+            from features.pvdata_kostal_json import pv_data
+            pvpower = pv_data.get("AC Power")
+            if pvpower is None: pvpower=0
+            pconsume = emparts.get('pconsume', 0)
+            psupply = emparts.get('psupply', 0)
+            pusage = pvpower + pconsume - psupply
+            data['pvpower'] = pvpower
+            data['pusage'] = pusage
+        except:
+            pv_data = None
+            print("no kostal inverter")
         pass
 
     influx_data['fields'] = data

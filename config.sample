@@ -77,7 +77,7 @@ debug=1
 # influx
 host=influxdb
 port=8086
-ssl=false
+ssl=
 db=SMA
 
 timeout=5
@@ -132,3 +132,30 @@ registers = [
     ['30975', 'S32', 'FIX2', 'intermediate voltage', 'V'],
     ['30225', 'S32', 'FIX0', 'Isolation resistance', u'\u03a9']
     ]
+
+[FEATURE-pvdata_kostal_json]
+# How frequently to send updates over (defaults to 20 sec)
+min_update=15
+#debug output
+debug=0
+
+#inverter connection
+inv_host = <inverter-ip>
+#['address', 'NONE', 'NONE' 'description', 'unit']
+# to get the same structure of sma pvdata feature
+registers = [
+      ['33556736', 'NONE', 'NONE', 'DC Power', 'W'],
+      ['33555202', 'NONE', 'NONE', 'DC string1 voltage', 'V'],
+      ['33555201', 'NONE', 'NONE', 'DC string1 current', 'A'],
+      ['33555203', 'NONE', 'NONE', 'DC string1 power', 'W'],
+      ['67109120', 'NONE', 'NONE', 'AC Power', 'W'],
+      ['67110400', 'NONE', 'NONE', 'AC frequency', 'Hz'],
+      ['67110656', 'NONE', 'NONE', 'AC cosphi', '°'],
+      ['67110144', 'NONE', 'NONE', 'AC ptot limitation', ''],
+      ['67109378', 'NONE', 'NONE', 'AC phase1 voltage', 'V'],
+      ['67109377', 'NONE', 'NONE', 'AC phase1 current', 'A'],
+      ['67109379', 'NONE', 'NONE', 'AC phase1 power', 'W'],
+      ['251658754', 'NONE', 'NONE', 'yield today', 'Wh'],
+      ['251658753', 'NONE', 'NONE', 'yield total', 'kWh'],
+      ['251658496', 'NONE', 'NONE', 'operationtime', ''],
+      ]

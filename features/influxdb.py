@@ -141,16 +141,20 @@ def run(emparts, config):
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
+        # total power consumption (grid + battery discharge)
+        phouse = pvpower + pconsume - psupply + pbattery
 
         if pdirectusage is None: pdirectusage=0
         if pvpower > pusage:
             pdirectusage = pusage
         else:
             pdirectusage = pvpower
+
         data['pdirectusage'] = pdirectusage
         data['pvpower'] = float(pvpower)
         data['pusage'] = float(pusage)
         data['pbattery'] = float(pbattery)
+        data['phouse'] = float(phouse)
     except:
         # Kostal inverter? (pvdata_kostal_json)
         print("except - no sma - inverter")

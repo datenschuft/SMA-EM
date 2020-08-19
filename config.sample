@@ -118,6 +118,9 @@ fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 pvmeasurement=SMAWR
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
 
+#ediplugs
+edimeasurement=edimax
+
 [FEATURE-pvdata]
 #Reads data from SMA inverter via Modbus.
 #Eable the mqtt feature to publish the data to a mqtt broker (features=pvdata mqtt),

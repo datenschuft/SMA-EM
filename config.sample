@@ -5,7 +5,7 @@
 serials=30028xxxxx
 # features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
 # list of features to load/run
-#features=simplefswriter sample pvdata mqtt remotedebug symcon influxdb
+#features=simplefswriter sample pvdata ediplugs mqtt remotedebug symcon influxdb
 features=simplefswriter
 
 [DAEMON]
@@ -194,3 +194,17 @@ registers = [
       ['251658753', 'NONE', 'NONE', 'yield total', 'kWh'],
       ['251658496', 'NONE', 'NONE', 'operationtime', ''],
       ]
+
+[FEATURE-ediplugs]
+# How frequently to send updates over (defaults to 20 sec)
+min_update=15
+#debug output
+debug=0
+
+# Edimax SP-2101W V2 with Firmware 3.00c change their default password during initial setup.
+# Find the actual password using this hack: https://discourse.nodered.org/t/searching-for-help-to-read-status-of-edimax-smartplug/15789/6
+# ['<ip>', 'admin', '<password>']
+plugs = [
+    ['host1', 'admin', '1234'],
+    ['host2', 'admin', '1234']
+    ]

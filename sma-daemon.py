@@ -17,6 +17,7 @@
  *  if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * 2020-01-04 datenschuft changes to tun with speedwiredecoder
+ * 2020-09-21 Tommi2Day add traceback for exception analysis
  */
 """
 import sys, time,os
@@ -26,6 +27,7 @@ from configparser import ConfigParser
 import socket
 import struct
 from speedwiredecoder import *
+import traceback
 
 #read configuration
 parser = ConfigParser()
@@ -129,7 +131,7 @@ class MyDaemon(daemon3x):
 							featurelist[featurenr]['feature'].run(emparts,featurelist[featurenr]['config'])
 			except Exception as e:
 				print("Daemon: Exception occured")
-				print(e)
+				print(traceback.format_exc())
 				pass
 #Daemon - Coding
 if __name__ == "__main__":

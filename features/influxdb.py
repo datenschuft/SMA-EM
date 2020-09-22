@@ -2,6 +2,7 @@
     Send SMA values influxdb
 
     2018-12-28 Tommi2Day
+    2020-09-22 Tommi2Day fix empty pv data and no ssl option
 
     Configuration:
     pip3 install influxdb datetime
@@ -35,19 +36,17 @@
 
 """
 
-import urllib.request,urllib.error
-import json
 import time
 import platform
 import datetime
 from influxdb import InfluxDBClient
 from influxdb.client import InfluxDBClientError
 
-
 influx_last_update = 0
-influx_debug=0
+influx_debug = 0
 
-def run(emparts,config):
+
+def run(emparts, config):
     global influx_last_update
     global influx_debug
 
@@ -61,19 +60,26 @@ def run(emparts,config):
     db = config.get('db', 'SMA')
     host = config.get('host', 'influxdb')
     port = int(config.get('port', 8086))
-    ssl = bool(config.get('ssl', 'false'))
+    ssl = bool(config.get('ssl'))
     timeout = int(config.get('timeout', 5))
     user = config.get('user', None)
-    password = config.get('password',None )
-    mesurement= config.get('measurement','SMAEM' )
+    password = config.get('password', None)
+    mesurement = config.get('measurement', 'SMAEM')
     fields = config.get('fields', 'pconsume,psupply')
-    pvfields=config.get('pvfields')
-    influx=None
-    #connect to db, create one if needed
+    pvfields = config.get('pvfields')
+    influx = None
+    # connect to db, create one if needed
     try:
-        influx = InfluxDBClient(host=host, port=port, ssl=ssl, verify_ssl=ssl, username=user, password=password, timeout=timeout)
+        if ssl == True:
+            influx = InfluxDBClient(host=host, port=port, ssl=ssl, verify_ssl=ssl, username=user, password=password,
+                                    timeout=timeout)
+            if influx_debug > 0:
+                print("Influxdb: use ssl")
+        else:
+            influx = InfluxDBClient(host=host, port=port, username=user, password=password, timeout=timeout)
+
         dbs = influx.get_list_database()
-        if influx_debug>1:
+        if influx_debug > 1:
             print(dbs)
         if not {"name": db} in dbs:
             print(db + ' not in list, create')
@@ -94,47 +100,44 @@ def run(emparts,config):
             print(e)
         return
 
-
-
-
-
     myhostname = platform.node()
     influx_last_update = time.time()
     now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    #last aupdate
+    # last aupdate
     influx_last_update = time.time()
     serial = emparts['serial']
 
-    #data fields
-    data={}
+    # data fields
+    data = {}
     for f in fields.split(','):
-        data[f] = emparts[f]
+        data[f] = emparts.get(f, 0.0)
 
     # data point
     influx_data = {}
     influx_data['measurement'] = mesurement
     influx_data['time'] = now
-    influx_data['tags']={}
-    influx_data['tags']["serial"]=serial
+    influx_data['tags'] = {}
+    influx_data['tags']["serial"] = serial
 
-    pvpower=0
+    pvpower = 0
     try:
         from features.pvdata import pv_data
-        pvpower = pv_data.get("AC Power")
-        if pvpower is None: pvpower=0
-        pconsume = emparts.get('pconsume', 0)
-        psupply = emparts.get('psupply', 0)
+        pvpower = 0.0
+        if pv_data != None:
+            pvpower = pv_data.get("AC Power", 0.0)
+        pconsume = emparts.get('pconsume', 0.0)
+        psupply = emparts.get('psupply', 0.0)
         pusage = pvpower + pconsume - psupply
         data['pvpower'] = pvpower
         data['pusage'] = pusage
     except:
-        #Kostal inverter? (pvdata_kostal_json)
+        # Kostal inverter? (pvdata_kostal_json)
         print("except - no sma - inverter")
         try:
             from features.pvdata_kostal_json import pv_data
             pvpower = pv_data.get("AC Power")
-            if pvpower is None: pvpower=0
+            if pvpower is None: pvpower = 0
             pconsume = emparts.get('pconsume', 0)
             psupply = emparts.get('psupply', 0)
             pusage = pvpower + pconsume - psupply
@@ -153,7 +156,7 @@ def run(emparts,config):
         influx.write_points(points, time_precision='s', protocol='json')
     except InfluxDBClientError as e:
         if influx_debug > 0:
-            print('InfluxDBError: %s' %(format(e)))
+            print('InfluxDBError: %s' % (format(e)))
             print("InfluxDB failed data:" + format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))),
                   format(points))
         pass
@@ -161,44 +164,47 @@ def run(emparts,config):
     else:
         if influx_debug > 0:
             print("InfluxDB: em data published %s:%s" % (
-            format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points)))
+                format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points)))
 
-    pvmeasurement=config.get('pvmeasurement')
-    if None in [pvfields,pv_data,pvmeasurement]: return
+    pvmeasurement = config.get('pvmeasurement')
+    if None in [pvfields, pv_data, pvmeasurement]: return
 
     influx_data = {}
-    data={}
+    data = {}
     influx_data['measurement'] = pvmeasurement
     influx_data['time'] = now
-    pvserial=pv_data.get('serial')
     influx_data['tags'] = {}
-    influx_data['tags']["serial"] = pvserial
-    #unly if we have values
-    if pvpower is not None:
+    # unly if we have values
+    if pv_data is not None:
         for f in pvfields.split(','):
-            data[f] = pv_data.get(f,0)
+            data[f] = pv_data.get(f, 0.0)
+        pvserial = pv_data.get('serial')
+        influx_data['tags']["serial"] = pvserial
 
     influx_data['fields'] = data
-    points=[influx_data]
+    points = [influx_data]
 
-    #send it
+    # send it
     try:
         influx.write_points(points, time_precision='s', protocol='json')
     except InfluxDBClientError as e:
         if influx_debug > 0:
             print('InfluxDBError: %s' % (format(e)))
-            print("InfluxDB failed pv data:"+format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points))
+            print("InfluxDB failed pv data:" + format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))),
+                  format(points))
         pass
 
     else:
         if influx_debug > 0:
-            print("InfluxDB: pv data published %s:%s" % (format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))),format(points)))
+            print("InfluxDB: pv data published %s:%s" % (
+            format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points)))
 
 
-def stopping(emparts,config):
+def stopping(emparts, config):
     pass
+
 
 def config(config):
     global influx_debug
-    influx_debug=int(config.get('debug', 0))
+    influx_debug = int(config.get('debug', 0))
     print('influxdb: feature enabled')

@@ -2,6 +2,7 @@
     Get inverter pv values via modbus
 
     2018-12-28 Tommi2Day
+    2020-09-22 Tommi2Day fixes empty data exeptions
 
     Configuration:
     pip3 install pymodbus
@@ -54,14 +55,13 @@ from features.smamodbus import get_pv_data
 
 pv_last_update = 0
 pv_debug = 0
-pv_data={}
+pv_data = {}
 
-def run(emparts,config):
 
+def run(emparts, config):
     global pv_debug
     global pv_last_update
     global pv_data
-
 
     # Only update every X seconds
     if time.time() < pv_last_update + int(config.get('min_update', 20)):
@@ -69,29 +69,29 @@ def run(emparts,config):
             print("pv: data skipping")
         return
 
-
     pv_last_update = time.time()
 
     pv_data = get_pv_data(config)
     # query
     if pv_data is None:
         if pv_debug > 0:
-            print("PV: no data" )
+            print("PV: no data")
+        return
 
     pv_data['timestamp'] = time.time()
     if pv_debug > 0:
-            print("PV:" + format(pv_data))
+        print("PV:" + format(pv_data))
 
 
-
-
-def stopping(emparts,config):
+def stopping(emparts, config):
     pass
 
-def on_publish(client,userdata,result):
+
+def on_publish(client, userdata, result):
     pass
+
 
 def config(config):
     global pv_debug
-    pv_debug=int(config.get('debug', 0))
+    pv_debug = int(config.get('debug', 0))
     print('pvdata: feature enabled')

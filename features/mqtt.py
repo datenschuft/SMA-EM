@@ -91,31 +91,30 @@ def run(emparts, config):
     if None not in [mqttuser, mqttpass]:
         client.username_pw_set(username=mqttuser, password=mqttpass)
 
-    if ssl_activate:
+    if ssl_activate == "1":
         # and ssl_ca_file:
         if ssl_certfile and ssl_keyfile and ssl_ca_file:
             # use client cert
             client.tls_set(ssl_ca_file, certfile=ssl_certfile, keyfile=ssl_keyfile, tls_version=tls)
             if mqtt_debug > 0:
-                print("mqtt ssl ca and client verify enabled")
+                print("mqtt: ssl ca and client verify enabled")
         elif ssl_ca_file:
             # no client cert
             client.tls_set(ssl_ca_file, tls_version=tls)
             if mqtt_debug > 0:
-                print("mqtt ssl ca verify enabled")
+                print("mqtt: ssl ca verify enabled")
         else:
             # disable certificat verify as there is no certificate
             client.tls_set(tls_version=tls)
             client.tls_insecure_set(True)
             if mqtt_debug > 0:
-                print("mqtt ssl verify disabled")
+                print("mqtt: ssl verify disabled")
     else:
         if mqtt_debug > 0:
-            print("ssl disabled")
-
+            print("mqtt: ssl disabled")
 
     # last aupdate
-    #last aupdate
+    # last aupdate
     mqtt_last_update = time.time()
 
     serial = emparts['serial']
@@ -134,10 +133,10 @@ def run(emparts, config):
         pusage = pvpower + pconsume - psupply
         data['pvsum'] = pvpower
         data['pusage'] = pusage
-        #daily sum
-        daily=pv_data.get("daily yield",0)
+        # daily sum
+        daily = pv_data.get("daily yield", 0)
         if daily is None: daily = 0
-        data['pvdaily']=daily
+        data['pvdaily'] = daily
 
     except:
         pv_data = None
@@ -153,7 +152,8 @@ def run(emparts, config):
         client.publish(topic, payload)
         if mqtt_debug > 0:
             print("mqtt: sma-em topic %s data published %s:%s" % (topic,
-                format(time.strftime("%H:%M:%S", time.localtime(mqtt_last_update))), payload))
+                                                                  format(time.strftime("%H:%M:%S", time.localtime(
+                                                                      mqtt_last_update))), payload))
         # publish each value as separate topic
         if publish_single == 1:
             for item in data.keys():
@@ -162,7 +162,6 @@ def run(emparts, config):
                     print("mqtt: publishing %s:%s" % (itemtopic, data[item]))
                 client.publish(itemtopic, str(data[item]))
 
-
         # pvoption
         mqttpvtopic = config.get('pvtopic', None)
         if None not in [pv_data, mqttpvtopic]:
@@ -170,13 +169,16 @@ def run(emparts, config):
                 pvserial = pv_data.get("serial")
                 pvtopic = mqttpvtopic + '/' + str(pvserial)
                 payload = json.dumps(pv_data)
-                #process last publish
+                # process last publish
                 client.loop(1)
-                #sendf pv topic
+                # sendf pv topic
                 client.publish(pvtopic, payload)
                 if mqtt_debug > 0:
                     print("mqtt: sma-pv topic %s data published %s:%s" % (pvtopic,
-                        format(time.strftime("%H:%M:%S", time.localtime(mqtt_last_update))), payload))
+                                                                          format(time.strftime("%H:%M:%S",
+                                                                                               time.localtime(
+                                                                                                   mqtt_last_update))),
+                                                                          payload))
 
     except Exception as e:
         print("mqtt: Error publishing")

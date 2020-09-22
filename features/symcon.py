@@ -3,6 +3,7 @@
     need Symcon 4.0+
 
     2018-12-23 Tommi2Day
+    2020-09-22 Tommi2Day fix empty pv data
 
     Configuration:
     [FEATURE-symcon]
@@ -24,14 +25,16 @@
 
 """
 
-import urllib.request,urllib.error
+import urllib.request, urllib.error
 import json
 import time
 import platform
 
 symcon_last_update = 0
-symcon_debug=0
-def run(emparts,config):
+symcon_debug = 0
+
+
+def run(emparts, config):
     global symcon_last_update
     global symcon_debug
 
@@ -45,7 +48,7 @@ def run(emparts,config):
     host = config.get('host', 'ips')
     port = config.get('port', 3777)
     timeout = config.get('timeout', 5)
-    emhook = config.get('emhook','/hook/smaem')
+    emhook = config.get('emhook', '/hook/smaem')
     user = config.get('user', None)
     password = config.get('password', None)
     fields = config.get('fields', 'pconsume,psupply')
@@ -55,32 +58,31 @@ def run(emparts,config):
 
     symcon_last_update = time.time()
 
-    url='http://'+host+':'+str(port)+emhook
+    url = 'http://' + host + ':' + str(port) + emhook
 
-    #last aupdate
+    # last aupdate
     symcon_last_update = time.time()
-
 
     serial = emparts['serial']
     data = {}
     for f in fields.split(','):
-        data[f] = emparts[f]
+        data[f] = emparts.get(f, 0)
 
-    data['timestamp']=symcon_last_update
-    data['sender']=myhostname
-    data['serial']=str(serial)
-    payload=json.dumps(data)
+    data['timestamp'] = symcon_last_update
+    data['sender'] = myhostname
+    data['serial'] = str(serial)
+    payload = json.dumps(data)
 
-    #prepare request
+    # prepare request
     req = urllib.request.Request(url)
     req.add_header('Content-Type', 'application/json; charset=utf-8')
     dataasbytes = payload.encode('utf-8')  # needs to be bytes
-    req.add_header('Content-Length', len(dataasbytes))
-    #print(dataasbytes)
+    req.add_header('Content-Length', str(len(dataasbytes)))
+    # print(dataasbytes)
     req.add_header("User-Agent", "SMEM")
 
-    #prepare auth
-    if None not in [user,password]:
+    # prepare auth
+    if None not in [user, password]:
         passman = urllib.request.HTTPPasswordMgrWithDefaultRealm()
         passman.add_password(None, url, user, password)
         authhandler = urllib.request.HTTPBasicAuthHandler(passman)
@@ -89,17 +91,17 @@ def run(emparts,config):
         if symcon_debug > 2:
             print('Symcon EM: use Basic auth')
 
-    #send it
+    # send it
     try:
-            response = urllib.request.urlopen(req, data=dataasbytes,timeout=int(timeout))
+        response = urllib.request.urlopen(req, data=dataasbytes, timeout=int(timeout))
 
     except urllib.error.HTTPError as e:
         if symcon_debug > 0:
-            print('Symcon EM: HTTPError: {%s} to %s' % (format(e.code),url ))
+            print('Symcon EM: HTTPError: {%s} to %s' % (format(e.code), url))
         pass
     except urllib.error.URLError as e:
         if symcon_debug > 0:
-            print('Symcon EM: URLError: {%s} to %s ' % (format(e.reason),url))
+            print('Symcon EM: URLError: {%s} to %s ' % (format(e.reason), url))
         pass
     except Exception as e:
         if symcon_debug > 0:
@@ -108,24 +110,31 @@ def run(emparts,config):
         pass
     else:
         if symcon_debug > 0:
-            print("Symcon EM: data published %s:%s to %s" % (format(time.strftime("%H:%M:%S", time.localtime(symcon_last_update))),payload,url))
+            print("Symcon EM: data published %s:%s to %s" % (
+            format(time.strftime("%H:%M:%S", time.localtime(symcon_last_update))), payload, url))
 
-    #send pv data
+    # send pv data
+    data = {}
     pvhook = config.get('pvhook')
     pvfields = config.get('pvfields', 'AC Power,daily yield')
-    if  None in [pvhook,pvfields]: return
+    if None in [pvhook, pvfields]: return
     try:
         from features.pvdata import pv_data
     except:
+        if symcon_debug > 0:
+            print("Symcon EM:  Error importing PV Data")
         return
+    if pv_data == None:
+        if symcon_debug > 0:
+            print("Symcon EM: No PV Data")
 
+        return
     serial = pv_data['serial']
-    data = {}
     pvurl = 'http://' + host + ':' + str(port) + pvhook
     pvpower = pv_data.get("AC Power")
-    if None in [serial,pvpower]: return
+    if None in [serial, pvpower]: return
     for f in pvfields.split(','):
-      data[f] = pv_data.get(f,0)
+        data[f] = pv_data.get(f, 0)
 
     data['timestamp'] = symcon_last_update
     data['sender'] = myhostname
@@ -136,7 +145,7 @@ def run(emparts,config):
     pvreq = urllib.request.Request(pvurl)
     pvreq.add_header('Content-Type', 'application/json; charset=utf-8')
     pvdataasbytes = pvpayload.encode('utf-8')  # needs to be bytes
-    pvreq.add_header('Content-Length', len(pvdataasbytes))
+    pvreq.add_header('Content-Length', str(len(pvdataasbytes)))
     # print(dataasbytes)
     pvreq.add_header("User-Agent", "SMWR")
 
@@ -157,11 +166,11 @@ def run(emparts,config):
 
     except urllib.error.HTTPError as e:
         if symcon_debug > 0:
-            print('Symcon PV : HTTPError: {%s} to %s ' % (format(e.reason),pvurl))
+            print('Symcon PV : HTTPError: {%s} to %s ' % (format(e.reason), pvurl))
         pass
     except urllib.error.URLError as e:
         if symcon_debug > 0:
-            print('Symcon PV: URLError: {%s} to %s ' % (format(e.reason),pvurl))
+            print('Symcon PV: URLError: {%s} to %s ' % (format(e.reason), pvurl))
         pass
     except Exception as e:
         if symcon_debug > 0:
@@ -171,13 +180,14 @@ def run(emparts,config):
     else:
         if symcon_debug > 0:
             print("Symcon PV: data published %s:%s to %s" % (
-            format(time.strftime("%H:%M:%S", time.localtime(symcon_last_update))), pvpayload,pvurl))
+                format(time.strftime("%H:%M:%S", time.localtime(symcon_last_update))), pvpayload, pvurl))
 
 
-def stopping(emparts,config):
+def stopping(emparts, config):
     pass
+
 
 def config(config):
     global symcon_debug
-    symcon_debug=int(config.get('debug', 0))
+    symcon_debug = int(config.get('debug', 0))
     print('symcon: feature enabled')

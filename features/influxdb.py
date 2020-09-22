@@ -129,8 +129,8 @@ def run(emparts, config):
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
-        data['pvpower'] = pvpower
-        data['pusage'] = pusage
+        data['pvpower'] = int(pvpower)
+        data['pusage'] = float(pusage)
     except:
         # Kostal inverter? (pvdata_kostal_json)
         print("except - no sma - inverter")

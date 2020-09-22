@@ -3,7 +3,7 @@
 
     2018-12-23 Tommi2Day
     2019-03-02 david-m-m
-    2020-09-21 Tommi2Day add ssl support
+    2020-09-22 Tommi2Day ssl support
 
     Configuration:
 
@@ -134,6 +134,11 @@ def run(emparts, config):
         pusage = pvpower + pconsume - psupply
         data['pvsum'] = pvpower
         data['pusage'] = pusage
+        #daily sum
+        daily=pv_data.get("daily yield",0)
+        if daily is None: daily = 0
+        data['pvdaily']=daily
+
     except:
         pv_data = None
         pass

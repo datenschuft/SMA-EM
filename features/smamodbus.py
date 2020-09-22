@@ -380,8 +380,8 @@ def get_pv_data(config):
 
     host = config.get('inv_host')
     port = config.get('inv_port', 502)
-    modbusid = config.get('inv_modbus', 3)
-    manufacturer = config.get('inv_modbus', 'Default')
+    modbusid = config.get('inv_modbus_id', 3)
+    manufacturer = config.get('inv_manufacturer', 'Default')
     registers = eval(config.get('registers'))
     client = ModbusClient(host=host, port=port)
     try:

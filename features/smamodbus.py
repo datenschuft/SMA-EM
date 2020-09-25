@@ -27,6 +27,7 @@ from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
 import datetime
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
+import traceback
 
 # defines
 MIN_SIGNED = -2147483648
@@ -376,13 +377,22 @@ pvenums = {
         9317: 'SB 5400TL-JP-22'
     }
 }
-def get_pv_data(config):
 
+
+def get_pv_data(config):
     host = config.get('inv_host')
     port = config.get('inv_port', 502)
     modbusid = config.get('inv_modbus_id', 3)
     manufacturer = config.get('inv_manufacturer', 'Default')
-    registers = eval(config.get('registers'))
+    # registers = [ ['30057', 'U32', 'RAW', 'serial', ''], ['30201','U32','ENUM','Status',''], ['30051','U32','ENUM','DeviceClass',''], ['30053','U32','ENUM','DeviceID',''], ['40631', 'STR32', 'UTF8', 'Device Name', ''], ['30775', 'S32', 'FIX0', 'AC Power', 'W'], ['30813', 'S32', 'FIX0', 'AC apparent power', 'VA'], ['30977', 'S32', 'FIX3', 'AC current', 'A'], ['30783', 'S32', 'FIX2', 'AC voltage', 'V'], ['30803', 'U32', 'FIX2', 'grid frequency', 'Hz'], ['30773', 'S32', 'FIX0', 'DC power', 'W'], ['30771', 'S32', 'FIX2', 'DC input voltage', 'V'], ['30777', 'S32', 'FIX0', 'Power L1', 'W'], ['30779', 'S32', 'FIX0', 'Power L2', 'W'], ['30781', 'S32', 'FIX0', 'Power L3', 'W'], ['30953', 'S32', 'FIX1', u'device temperature', u'\xb0C'], ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'], ['30513', 'U64', 'FIX3', 'total yield', 'kWh'], ['30521', 'U64', 'FIX0', 'operation time', 's'], ['30525', 'U64', 'FIX0', 'feed-in time', 's'], ['30975', 'S32', 'FIX2', 'intermediate voltage', 'V'], ['30225', 'S32', 'FIX0', 'Isolation resistance', u'\u03a9'] ]
+    registerconfig = config.get('registers')
+    registers = None
+    if registerconfig:
+        registers = eval(registerconfig)
+    if None in (registers, host, port, modbusid):
+        print("Modbus: missing modbus parameter inv_")
+        return None
+
     client = ModbusClient(host=host, port=port)
     try:
         client.connect()
@@ -390,23 +400,21 @@ def get_pv_data(config):
         print('Modbus Connection Error', 'could not connect to target. Check your settings, please.')
         return None
 
-
-
-
     data = {}  ## empty data store for current values
 
     for myreg in registers:
         ## if the connection is somehow not possible (e.g. target not responding)
         #  show a error message instead of excepting and stopping
         try:
-            received = client.read_input_registers(address=int(myreg[0]),
-                                                        count=modbusdatatype[myreg[1]],
-                                                        unit=modbusid)
-        except:
+            addr = int(myreg[0])
+            dt = myreg[1]
+            received = client.read_input_registers(address=addr, count=modbusdatatype[dt], unit=int(modbusid))
+        except Exception as e:
             thisdate = str(datetime.datetime.now()).partition('.')[0]
-            thiserrormessage = thisdate + ': Connection not possible. Check settings or connection.'
+            thiserrormessage = thisdate + 'Modbus: Connection not possible. Check settings or connection.'
             print(thiserrormessage)
-            return  None ## prevent further execution of this function
+            print(traceback.format_exc())
+            return None  ## prevent further execution of this function
 
         name = myreg[3]
         message = BinaryPayloadDecoder.fromRegisters(received.registers, byteorder=Endian.Big, wordorder=Endian.Big)
@@ -430,7 +438,7 @@ def get_pv_data(config):
         if ((interpreted == MIN_SIGNED) or (interpreted == MAX_UNSIGNED)):
             value = None
         else:
-        ## put the data with correct formatting into the data table
+            ## put the data with correct formatting into the data table
             if myreg[2] == 'FIX3':
                 value = float(interpreted) / 1000
             elif myreg[2] == 'FIX2':
@@ -438,10 +446,10 @@ def get_pv_data(config):
             elif myreg[2] == 'FIX1':
                 value = float(interpreted) / 10
             elif myreg[2] == 'UTF8':
-                value = str(interpreted,'UTF-8').rstrip("\x00")
+                value = str(interpreted, 'UTF-8').rstrip("\x00")
             elif myreg[2] == 'ENUM':
-                e=pvenums.get(name,{})
-                value = e.get(interpreted,str(interpreted))
+                e = pvenums.get(name, {})
+                value = e.get(interpreted, str(interpreted))
             else:
                 value = interpreted
         data[name] = value

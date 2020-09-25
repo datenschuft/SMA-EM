@@ -111,7 +111,8 @@ def run(emparts, config):
     # data fields
     data = {}
     for f in fields.split(','):
-        data[f] = emparts.get(f, 0.0)
+        data[f] = emparts.get(f)
+        if data[f] is None: data[f] = 0.0
 
     # data point
     influx_data = {}
@@ -129,7 +130,7 @@ def run(emparts, config):
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
-        data['pvpower'] = int(pvpower)
+        data['pvpower'] = float(pvpower)
         data['pusage'] = float(pusage)
     except:
         # Kostal inverter? (pvdata_kostal_json)
@@ -177,7 +178,8 @@ def run(emparts, config):
     # unly if we have values
     if pv_data is not None:
         for f in pvfields.split(','):
-            data[f] = pv_data.get(f, 0.0)
+            data[f] = pv_data.get(f)
+            if data[f] is None: data[f]=0.0
         pvserial = pv_data.get('serial')
         influx_data['tags']["serial"] = pvserial
 

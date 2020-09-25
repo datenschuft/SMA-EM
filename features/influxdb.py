@@ -123,11 +123,11 @@ def run(emparts, config):
     pvpower = 0
     try:
         from features.pvdata import pv_data
-        pvpower = 0.0
+        pvpower = 0
         if pv_data != None:
-            pvpower = pv_data.get("AC Power", 0.0)
-        pconsume = emparts.get('pconsume', 0.0)
-        psupply = emparts.get('psupply', 0.0)
+            pvpower = pv_data.get("AC Power", 0)
+        pconsume = emparts.get('pconsume', 0)
+        psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
         data['pvpower'] = pvpower
         data['pusage'] = pusage

@@ -39,8 +39,15 @@ mqtthost=mqtt
 mqttport=1883
 #mqttuser=
 #mqttpass=
+#Define the SMA Energy Meter data fields published to the mqtt broker
+#(p=real power, q=reactive power, s=apparent power, i=current, u=voltage):
+#mqttfields=pconsume,psupply,qconsume,qsupply,sconsume,ssupply,cosphi,frequency,
+#           p1consume,p1supply,q1consume,q1supply,s1consume,s1supply,i1,u1,cosphi1,
+#           p2consume,p2supply,q2consume,q2supply,s2consume,s2supply,i2,u2,cosphi2,
+#           p3consume,p3supply,q3consume,q3supply,s3consume,s3supply,i3,u3,cosphi3,
+#           speedwire-version
 mqttfields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
-#topic will be exted3ed with serial
+#topic will be exteded with serial
 mqtttopic=SMA-EM/status
 # publish all values as single topics (0 or 1)
 publish_single=1
@@ -113,23 +120,29 @@ registers = [
     ['30201','U32','ENUM','Status',''],
     ['30051','U32','ENUM','DeviceClass',''],
     ['30053','U32','ENUM','DeviceID',''],
-    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
-    ['30775', 'S32', 'FIX0', 'AC Power', 'W'],
+    ['40631', 'STR32', 'UTF8', 'Device name', ''],
+    ['30775', 'S32', 'FIX0', 'AC power', 'W'],
     ['30813', 'S32', 'FIX0', 'AC apparent power', 'VA'],
     ['30977', 'S32', 'FIX3', 'AC current', 'A'],
-    ['30783', 'S32', 'FIX2', 'AC voltage', 'V'],
-    ['30803', 'U32', 'FIX2', 'grid frequency', 'Hz'],
-    ['30773', 'S32', 'FIX0', 'DC power', 'W'],
-    ['30771', 'S32', 'FIX2', 'DC input voltage', 'V'],
+    ['30783', 'S32', 'FIX2', 'AC voltage L1', 'V'],
+    ['30785', 'S32', 'FIX2', 'AC voltage L2', 'V'],
+    ['30787', 'S32', 'FIX2', 'AC voltage L3', 'V'],
+    ['30803', 'U32', 'FIX2', 'Grid frequency', 'Hz'],
+    ['30773', 'S32', 'FIX0', 'DC power input 1', 'W'],
+    ['30771', 'S32', 'FIX2', 'DC voltage input 1', 'V'],
+    ['30769', 'S32', 'FIX3', 'DC current input 1', 'A'],
+    ['30961', 'S32', 'FIX0', 'DC power input 2', 'W'],
+    ['30959', 'S32', 'FIX2', 'DC voltage input 2', 'V'],
+    ['30957', 'S32', 'FIX3', 'DC current input 2', 'A'],
     ['30777', 'S32', 'FIX0', 'Power L1', 'W'],
     ['30779', 'S32', 'FIX0', 'Power L2', 'W'],
     ['30781', 'S32', 'FIX0', 'Power L3', 'W'],
-    ['30953', 'S32', 'FIX1', u'device temperature', u'\xb0C'],
-    ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],
-    ['30513', 'U64', 'FIX3', 'total yield', 'kWh'],
-    ['30521', 'U64', 'FIX0', 'operation time', 's'],
-    ['30525', 'U64', 'FIX0', 'feed-in time', 's'],
-    ['30975', 'S32', 'FIX2', 'intermediate voltage', 'V'],
+    ['30953', 'S32', 'FIX1', 'Device temperature', u'\xb0C'],
+    ['30517', 'U64', 'FIX3', 'Daily yield', 'kWh'],
+    ['30513', 'U64', 'FIX3', 'Total yield', 'kWh'],
+    ['30521', 'U64', 'FIX0', 'Operation time', 's'],
+    ['30525', 'U64', 'FIX0', 'Feed-in time', 's'],
+    ['30975', 'S32', 'FIX2', 'Intermediate voltage', 'V'],
     ['30225', 'S32', 'FIX0', 'Isolation resistance', u'\u03a9']
     ]
 

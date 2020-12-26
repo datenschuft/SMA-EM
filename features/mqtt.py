@@ -148,7 +148,7 @@ def run(emparts, config):
     try:
         # mqtt connect
         client.connect(str(mqtthost), int(mqttport))
-        client.on_publish = on_publish
+        client.loop_start()
         client.publish(topic, payload)
         if mqtt_debug > 0:
             print("mqtt: sma-em topic %s data published %s:%s" % (topic,
@@ -169,8 +169,6 @@ def run(emparts, config):
                 pvserial = pv_data.get("serial")
                 pvtopic = mqttpvtopic + '/' + str(pvserial)
                 payload = json.dumps(pv_data)
-                # process last publish
-                client.loop(1)
                 # sendf pv topic
                 client.publish(pvtopic, payload)
                 if mqtt_debug > 0:
@@ -179,6 +177,8 @@ def run(emparts, config):
                                                                                                time.localtime(
                                                                                                    mqtt_last_update))),
                                                                           payload))
+        client.loop_stop()
+        client.disconnect()
 
     except Exception as e:
         print("mqtt: Error publishing")
@@ -187,11 +187,6 @@ def run(emparts, config):
 
 
 def stopping(emparts, config):
-    pass
-
-
-def on_publish(client, userdata, result):
-    time.sleep(0.01)  # experimental value, seems to work...
     pass
 
 

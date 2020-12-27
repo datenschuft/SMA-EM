@@ -1,0 +1,22 @@
+SMA-EM-Daemon changelog-File
+
+20200104001
+    fixed issue 21 new datagramsize with homemanager version 2.3.4.R
+    package split based on coding pull request 18 (david-m-m)
+
+20190402001
+    Cosmetics / variables naming #14
+    replaced pregard with consume and surplus with supply
+
+20180223001
+    Merge branch 'Tommi2Day-master' https://github.com/datenschuft/SMA-EM/pull/13
+    thanks to Tommi2Day
+    - sma-daemon: allow read config from workdir, make status dir configurable, add config callback, exit if serials not set,small fixes
+    - add feature "pvdata" for getting PV data from SMA Inverters via Modbus along SMA-EM/HM
+    - add feature "mqtt" to send SMA EM and PV data to an MQTT broker
+    - add feature "remotedebug" to allow remote debug from PyCharm
+    - add feature "influxdb" and sample grafana dashboard based on this plugin
+    - add feature "symcon" to supply SMA EM/HOM and PV data to "IP-Symcon" (https://www.symcon.de/en/ ) via WebHook and provide sample webhook scripts
+    - add config.sample
+
+older versions were not tracked

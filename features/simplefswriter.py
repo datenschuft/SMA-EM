@@ -18,19 +18,37 @@
  */
 """
 
+import os,time
+sw_debug=0
+
 def run(emparts,config):
-    #print("running feature simplefswriter")
+    global sw_debug
     values=config['values'].split(' ')
     serials=config['serials'].split(' ')
+    statusdir = config.get('statusdir','')
+    #prefere shm
+    if (statusdir==''):
+        statusdir="/run/shm/"
+    #fallback to local dir
+    if not os.path.isdir(statusdir):
+        statusdir=''
     for serial in serials:
         if serial==format(emparts['serial']):
+            ts=(format(time.strftime("%H:%M:%S", time.localtime())))
             for value in values:
-                #print ("-"+format(value)+('%.4f' % emparts[value]))
-                #print (value)
-                file = open("/run/shm/em-"+format(serial)+"-"+format(value), "w")
-                file.write('%.4f' % emparts[value])
-                file.close()
+                if value in emparts.keys():
+                    if sw_debug >0:
+                        print ('simplewriter: '+ts+" - "+format(value)+': '+('%.4f' % emparts[value]))
+                    file = open(statusdir+"em-"+format(serial)+"-"+format(value), "w")
+                    file.write('%.4f' % emparts[value])
+                    file.close()
+                elif sw_debug > 0:
+                    print ('simplefswriter: could not find value for '+format(value))
 
 def stopping(emparts,config):
     print("quitting")
     #close files
+def config(config):
+    global sw_debug
+    sw_debug = int(config.get('debug', 0))
+    print("simplefswriter: feature enabled")

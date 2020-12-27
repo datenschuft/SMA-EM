@@ -1,0 +1,176 @@
+
+[SMA-EM]
+# serials of sma-ems the daemon should take notice
+# seperated by space
+serials=30028xxxxx
+# features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
+# list of features to load/run
+#features=simplefswriter sample pvdata mqtt remotedebug symcon influxdb
+features=simplefswriter
+
+[DAEMON]
+pidfile=/run/smaemd.pid
+# listen on an interface with the given ip
+# use 0.0.0.0 for any interface
+ipbind=0.0.0.0
+# multicast ip and port of sma-datagrams
+# defaults
+mcastgrp=239.12.255.254
+mcastport=9522
+statusdir=
+
+# each feature/plugin has its own section
+# called FEATURE-[featurename]
+# the feature section is required if a feature is listed in [SMA-EM]features
+
+[FEATURE-simplefswriter]
+# list serials simplefswriter notice
+serials=30028xxxxx
+# measurement vars simplefswriter should write to filesystem (only from smas with serial in serials)
+values=pconsume psupply qsupply ssupply
+statusdir=
+
+[FEATURE-sample]
+nothing=here
+
+[FEATURE-mqtt]
+# MQTT broker details
+mqtthost=mqtt
+mqttport=1883
+#mqttuser=
+#mqttpass=
+mqttfields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
+#topic will be exted3ed with serial
+mqtttopic=SMA-EM/status
+pvtopic=SMA-PV/status
+# publish all values as single topics (0 or 1)
+publish_single=1
+# How frequently to send updates over (defaults to 20 sec)
+min_update=30
+#debug output
+debug=0
+
+# ssl support
+# adopt mqttport above to your ssl enabled mqtt port, usually 8883
+# options:
+# activate without certs=use tls_insecure
+# activate with ca_file, but without client_certs
+ssl_activate=0
+# ca file to verify
+ssl_ca_file=ca.crt
+# client certs
+ssl_certfile=
+ssl_keyfile=
+#TLSv1.1 or TLSv1.2 (default 2)
+tls_protocol=2
+
+
+[FEATURE-remotedebug]
+# Debug settings
+debughost=mypc
+debugport=9100
+
+[FEATURE-symcon]
+# symcon
+host=ips
+port=3777
+timeout=5
+user=Symcon
+password=SMA-EMdata
+
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply,psupplycounter,pconsumecounter
+emhook=/hook/smaem
+pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3,Status
+pvhook=/hook/smawr
+
+# How frequently to send updates over (defaults to 20 sec)
+min_update=30
+
+debug=0
+
+[FEATURE-influxdb]
+# influx
+host=influxdb
+port=8086
+ssl=
+db=SMA
+
+timeout=5
+user=
+password=
+# How frequently to send updates over (defaults to 20 sec)
+min_update=30
+
+debug=0
+#emdata
+measurement=SMAEM
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
+
+#pvdata
+pvmeasurement=SMAWR
+pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
+
+[FEATURE-pvdata]
+
+# How frequently to send updates over (defaults to 20 sec)
+min_update=30
+#debug output
+debug=1
+
+#inverter connection
+inv_host = <inverter-ip>
+inv_port = 502
+inv_modbus_id = 3
+inv_manufacturer = SMA
+#['address', 'type', 'format', 'description', 'unit', 'value']
+registers = [
+    ['30057', 'U32', 'RAW', 'serial', ''],
+    ['30201','U32','ENUM','Status',''],
+    ['30051','U32','ENUM','DeviceClass',''],
+    ['30053','U32','ENUM','DeviceID',''],
+    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
+    ['30775', 'S32', 'FIX0', 'AC Power', 'W'],
+    ['30813', 'S32', 'FIX0', 'AC apparent power', 'VA'],
+    ['30977', 'S32', 'FIX3', 'AC current', 'A'],
+    ['30783', 'S32', 'FIX2', 'AC voltage', 'V'],
+    ['30803', 'U32', 'FIX2', 'grid frequency', 'Hz'],
+    ['30773', 'S32', 'FIX0', 'DC power', 'W'],
+    ['30771', 'S32', 'FIX2', 'DC input voltage', 'V'],
+    ['30777', 'S32', 'FIX0', 'Power L1', 'W'],
+    ['30779', 'S32', 'FIX0', 'Power L2', 'W'],
+    ['30781', 'S32', 'FIX0', 'Power L3', 'W'],
+    ['30953', 'S32', 'FIX1', u'device temperature', u'\xb0C'],
+    ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],
+    ['30513', 'U64', 'FIX3', 'total yield', 'kWh'],
+    ['30521', 'U64', 'FIX0', 'operation time', 's'],
+    ['30525', 'U64', 'FIX0', 'feed-in time', 's'],
+    ['30975', 'S32', 'FIX2', 'intermediate voltage', 'V'],
+    ['30225', 'S32', 'FIX0', 'Isolation resistance', u'\u03a9']
+    ]
+
+[FEATURE-pvdata_kostal_json]
+# How frequently to send updates over (defaults to 20 sec)
+min_update=15
+#debug output
+debug=0
+
+#inverter connection
+inv_host = <inverter-ip>
+#['address', 'NONE', 'NONE' 'description', 'unit']
+# to get the same structure of sma pvdata feature
+registers = [
+      ['33556736', 'NONE', 'NONE', 'DC Power', 'W'],
+      ['33555202', 'NONE', 'NONE', 'DC string1 voltage', 'V'],
+      ['33555201', 'NONE', 'NONE', 'DC string1 current', 'A'],
+      ['33555203', 'NONE', 'NONE', 'DC string1 power', 'W'],
+      ['67109120', 'NONE', 'NONE', 'AC Power', 'W'],
+      ['67110400', 'NONE', 'NONE', 'AC frequency', 'Hz'],
+      ['67110656', 'NONE', 'NONE', 'AC cosphi', '°'],
+      ['67110144', 'NONE', 'NONE', 'AC ptot limitation', ''],
+      ['67109378', 'NONE', 'NONE', 'AC phase1 voltage', 'V'],
+      ['67109377', 'NONE', 'NONE', 'AC phase1 current', 'A'],
+      ['67109379', 'NONE', 'NONE', 'AC phase1 power', 'W'],
+      ['251658754', 'NONE', 'NONE', 'yield today', 'Wh'],
+      ['251658753', 'NONE', 'NONE', 'yield total', 'kWh'],
+      ['251658496', 'NONE', 'NONE', 'operationtime', ''],
+      ]

@@ -19,15 +19,20 @@
  *  You should have received a copy of the GNU General Public License along with this program;
  *  if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * 2018-12-22 Tommi2Day small enhancements
+ * 2019-08-13 datenschuft run without config
+ * 2020-01-04 datenschuft changes to tun with speedwiredecoder
+ *
  */
 """
 
 import signal
 import sys
-import smaem
+#import smaem
 import socket
 import struct
-from configparser import SafeConfigParser
+from configparser import ConfigParser
+from speedwiredecoder import *
 
 # clean exit
 def abortprogram(signal,frame):
@@ -38,25 +43,22 @@ def abortprogram(signal,frame):
 # abort-signal
 signal.signal(signal.SIGINT, abortprogram)
 
-# listen to the Multicast; SMA-Energymeter sends its measurements to 239.12.255.254:9522
 
 #read configuration
-parser = SafeConfigParser()
-parser.read('/etc/smaemd/config')
-
-smaemserials=parser.get('SMA-EM', 'serials')
-serials=smaemserials.split(' ')
-#smavalues=parser.get('SMA-EM', 'values')
-#values=smavalues.split(' ')
-pidfile=parser.get('DAEMON', 'pidfile')
-ipbind=parser.get('DAEMON', 'ipbind')
-MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
-MCAST_PORT = int(parser.get('DAEMON', 'mcastport'))
-
-if MCAST_GRP == "":
-    MCAST_GRP = '239.12.255.254'
-if MCAST_PORT == 0:
-    MCAST_PORT = 9522
+parser = ConfigParser()
+#default values
+smaserials = ""
+ipbind = '0.0.0.0'
+MCAST_GRP = '239.12.255.254'
+MCAST_PORT = 9522
+parser.read(['/etc/smaemd/config','config'])
+try:
+    smaemserials=parser.get('SMA-EM', 'serials')
+    ipbind=parser.get('DAEMON', 'ipbind')
+    MCAST_GRP = parser.get('DAEMON', 'mcastgrp')
+    MCAST_PORT = int(parser.get('DAEMON', 'mcastport'))
+except:
+    print('Cannot find config /etc/smaemd/config... using defaults')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -70,8 +72,7 @@ except BaseException:
 # processing received messages
 while True:
   emparts = {}
-  emparts=smaem.readem(sock)
-  #
+  emparts=decode_speedwire(sock.recv(608))
   # Output...
   # don't know what P,Q and S means:
   # http://en.wikipedia.org/wiki/AC_power or http://de.wikipedia.org/wiki/Scheinleistung
@@ -80,22 +81,25 @@ while True:
   print ('\n')
   print ('SMA-EM Serial:{}'.format(emparts['serial']))
   print ('----sum----')
-  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(emparts['pregard'],emparts['pregardcounter'],emparts['psurplus'],emparts['psurpluscounter']))
-  print ('S: regard:{}VA {}kVAh surplus:{}VA {}VAh'.format(emparts['sregard'],emparts['sregardcounter'],emparts['ssurplus'],emparts['ssurpluscounter']))
-  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['qregard'],emparts['qregardcounter'],emparts['qsurplus'],emparts['qsurpluscounter']))
+  print ('P: consume:{}W {}kWh supply:{}W {}kWh'.format(emparts['pconsume'],emparts['pconsumecounter'],emparts['psupply'],emparts['psupplycounter']))
+  print ('S: consume:{}VA {}kVAh supply:{}VA {}VAh'.format(emparts['sconsume'],emparts['sconsumecounter'],emparts['ssupply'],emparts['ssupplycounter']))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['qconsume'],emparts['qconsumecounter'],emparts['qsupply'],emparts['qsupplycounter']))
   print ('cos phi:{}°'.format(emparts['cosphi']))
+  if emparts['speedwire-version']=="2.3.4.R|020304":
+    print ('frequency:{}Hz'.format(emparts['frequency']))
   print ('----L1----')
-  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(emparts['p1regard'],emparts['p1regardcounter'],emparts['p1surplus'],emparts['p1surpluscounter']))
-  print ('S: regard:{}VA {}kVAh surplus:{}VA {}kVAh'.format(emparts['s1regard'],emparts['s1regardcounter'],emparts['s1surplus'],emparts['s1surpluscounter']))
-  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q1regard'],emparts['q1regardcounter'],emparts['q1surplus'],emparts['q1surpluscounter']))
-  print ('U: {}V thd:{}% cos phi:{}°'.format(emparts['v1'],emparts['thd1'],emparts['cosphi1']))
+  print ('P: consume:{}W {}kWh supply:{}W {}kWh'.format(emparts['p1consume'],emparts['p1consumecounter'],emparts['p1supply'],emparts['p1supplycounter']))
+  print ('S: consume:{}VA {}kVAh supply:{}VA {}kVAh'.format(emparts['s1consume'],emparts['s1consumecounter'],emparts['s1supply'],emparts['s1supplycounter']))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q1consume'],emparts['q1consumecounter'],emparts['q1supply'],emparts['q1supplycounter']))
+  print ('U: {}V I:{}A cos phi:{}°'.format(emparts['u1'],emparts['i1'],emparts['cosphi1']))
   print ('----L2----')
-  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(emparts['p2regard'],emparts['p2regardcounter'],emparts['p2surplus'],emparts['p2surpluscounter']))
-  print ('S: regard:{}VA {}kVAh surplus:{}VA {}kVAh'.format(emparts['s2regard'],emparts['s2regardcounter'],emparts['s2surplus'],emparts['s2surpluscounter']))
-  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q2regard'],emparts['q2regardcounter'],emparts['q2surplus'],emparts['q2surpluscounter']))
-  print ('U: {}V thd:{}% cos phi:{}°'.format(emparts['v2'],emparts['thd2'],emparts['cosphi2']))
+  print ('P: consume:{}W {}kWh supply:{}W {}kWh'.format(emparts['p2consume'],emparts['p2consumecounter'],emparts['p2supply'],emparts['p2supplycounter']))
+  print ('S: consume:{}VA {}kVAh supply:{}VA {}kVAh'.format(emparts['s2consume'],emparts['s2consumecounter'],emparts['s2supply'],emparts['s2supplycounter']))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q2consume'],emparts['q2consumecounter'],emparts['q2supply'],emparts['q2supplycounter']))
+  print ('U: {}V I:{}A cos phi:{}°'.format(emparts['u2'],emparts['i2'],emparts['cosphi2']))
   print ('----L3----')
-  print ('P: regard:{}W {}kWh surplus:{}W {}kWh'.format(emparts['p3regard'],emparts['p3regardcounter'],emparts['p3surplus'],emparts['p3surpluscounter']))
-  print ('S: regard:{}VA {}kVAh surplus:{}VA {}kVAh'.format(emparts['s3regard'],emparts['s3regardcounter'],emparts['s3surplus'],emparts['s3surpluscounter']))
-  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q3regard'],emparts['q3regardcounter'],emparts['q3surplus'],emparts['q3surpluscounter']))
-  print ('U: {}V thd:{}% cos phi:{}°'.format(emparts['v3'],emparts['thd3'],emparts['cosphi3']))
+  print ('P: consume:{}W {}kWh supply:{}W {}kWh'.format(emparts['p3consume'],emparts['p3consumecounter'],emparts['p3supply'],emparts['p3supplycounter']))
+  print ('S: consume:{}VA {}kVAh supply:{}VA {}kVAh'.format(emparts['s3consume'],emparts['s3consumecounter'],emparts['s3supply'],emparts['s3supplycounter']))
+  print ('Q: cap {}var {}kvarh ind {}var {}kvarh'.format(emparts['q3consume'],emparts['q3consumecounter'],emparts['q3supply'],emparts['q3supplycounter']))
+  print ('U: {}V I:{}A cos phi:{}°'.format(emparts['u3'],emparts['i3'],emparts['cosphi3']))
+  print ('Version: {}'.format(emparts['speedwire-version']))

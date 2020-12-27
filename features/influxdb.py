@@ -122,6 +122,7 @@ def run(emparts, config):
     influx_data['tags']["serial"] = serial
 
     pvpower = 0
+    pdirectusage = 0
     try:
         from features.pvdata import pv_data
         pvpower = 0
@@ -130,6 +131,12 @@ def run(emparts, config):
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
+        if pdirectusage is None: pdirectusage=0
+        if pvpower > pusage:
+            pdirectusage = pusage
+        else:
+            pdirectusage = pvpower
+        data['pdirectusage'] = pdirectusage
         data['pvpower'] = float(pvpower)
         data['pusage'] = float(pusage)
     except:
@@ -142,6 +149,12 @@ def run(emparts, config):
             pconsume = emparts.get('pconsume', 0)
             psupply = emparts.get('psupply', 0)
             pusage = pvpower + pconsume - psupply
+            if pdirectusage is None: pdirectusage=0
+            if pvpower > pusage:
+                pdirectusage = pusage
+            else:
+                pdirectusage = pvpower
+            data['pdirectusage'] = pdirectusage
             data['pvpower'] = pvpower
             data['pusage'] = pusage
         except:

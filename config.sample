@@ -35,18 +35,26 @@ nothing=here
 
 [FEATURE-mqtt]
 # MQTT broker details
+#mqtthost=::1
 mqtthost=mqtt
 mqttport=1883
 #mqttuser=
 #mqttpass=
-mqttfields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
-#topic will be exted3ed with serial
+#Define the SMA Energy Meter data fields published to the mqtt broker
+#(p=real power, q=reactive power, s=apparent power, i=current, u=voltage):
+#mqttfields=pconsume,psupply,qconsume,qsupply,sconsume,ssupply,cosphi,frequency,
+#           p1consume,p1supply,q1consume,q1supply,s1consume,s1supply,i1,u1,cosphi1,
+#           p2consume,p2supply,q2consume,q2supply,s2consume,s2supply,i2,u2,cosphi2,
+#           p3consume,p3supply,q3consume,q3supply,s3consume,s3supply,i3,u3,cosphi3,
+#           speedwire-version
+mqttfields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply,frequency
+#topic will be exteded with serial
 mqtttopic=SMA-EM/status
 pvtopic=SMA-PV/status
 # publish all values as single topics (0 or 1)
 publish_single=1
 # How frequently to send updates over (defaults to 20 sec)
-min_update=30
+min_update=5
 #debug output
 debug=0
 
@@ -111,41 +119,53 @@ pvmeasurement=SMAWR
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
 
 [FEATURE-pvdata]
+#Reads data from SMA inverter via Modbus.
+#Eable the mqtt feature to publish the data to a mqtt broker (features=pvdata mqtt),
+and/or stored the data to a influx database (features=pvdata influxdb), and/or symcom ...
 
 # How frequently to send updates over (defaults to 20 sec)
-min_update=30
+min_update=5
 #debug output
-debug=1
+debug=0
 
 #inverter connection
 inv_host = <inverter-ip>
 inv_port = 502
 inv_modbus_id = 3
 inv_manufacturer = SMA
-#['address', 'type', 'format', 'description', 'unit', 'value']
+
+#For Modbus registers, see e.g. https://www.google.com/search?q=SMA_Modbus-TI-en-23.xlsx
+#['Modbus register address', 'Format', 'Unit', 'Name', 'Type']
+#If the mqtt feature is used, 'Name' is included in the MQTT JSON payload as tag name.
 registers = [
-    ['30057', 'U32', 'RAW', 'serial', ''],
-    ['30201','U32','ENUM','Status',''],
-    ['30051','U32','ENUM','DeviceClass',''],
-    ['30053','U32','ENUM','DeviceID',''],
-    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
-    ['30775', 'S32', 'FIX0', 'AC Power', 'W'],
-    ['30813', 'S32', 'FIX0', 'AC apparent power', 'VA'],
-    ['30977', 'S32', 'FIX3', 'AC current', 'A'],
-    ['30783', 'S32', 'FIX2', 'AC voltage', 'V'],
-    ['30803', 'U32', 'FIX2', 'grid frequency', 'Hz'],
-    ['30773', 'S32', 'FIX0', 'DC power', 'W'],
-    ['30771', 'S32', 'FIX2', 'DC input voltage', 'V'],
-    ['30777', 'S32', 'FIX0', 'Power L1', 'W'],
-    ['30779', 'S32', 'FIX0', 'Power L2', 'W'],
-    ['30781', 'S32', 'FIX0', 'Power L3', 'W'],
-    ['30953', 'S32', 'FIX1', u'device temperature', u'\xb0C'],
-    ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],
-    ['30513', 'U64', 'FIX3', 'total yield', 'kWh'],
-    ['30521', 'U64', 'FIX0', 'operation time', 's'],
-    ['30525', 'U64', 'FIX0', 'feed-in time', 's'],
-    ['30975', 'S32', 'FIX2', 'intermediate voltage', 'V'],
-    ['30225', 'S32', 'FIX0', 'Isolation resistance', u'\u03a9']
+    ['30057', 'U32', 'RAW', 'serial', ''],               #Don't change 'serial'      => it is used in some features/*.py files. As alternative use the mqtt topic
+    ['30201', 'U32', 'ENUM', 'Status',''],               #Don't change 'Status'      => it is used in smamodbus.py to decode the enumeration
+    ['30051', 'U32', 'ENUM', 'DeviceClass',''],          #Don't change 'DeviceClass' => it is used in smamodbus.py to decode the enumeration
+    ['30053', 'U32', 'ENUM', 'DeviceID',''],             #Don't change 'DeviceID'    => it is used in smamodbus.py to decode the enumeration
+#    ['40631', 'STR32', 'UTF8', 'Device_Name', ''],
+    ['30775', 'S32', 'FIX0', 'AC Power', 'W'],           #Don't change 'AC Power'    => it is used in some features/*.py files. As alternative use the mqtt topic 'SMA-EM/status/30028xxxxx/pvsum' => 30028xxxxx => see 'serials' above
+#    ['30813', 'S32', 'FIX0', 'AC_Power_Apparent', 'VA'],
+    ['30977', 'S32', 'FIX3', 'AC_Current', 'A'],
+#    ['30783', 'S32', 'FIX2', 'AC_Voltage_L1', 'V'],
+#    ['30785', 'S32', 'FIX2', 'AC_Voltage_L2', 'V'],
+#    ['30787', 'S32', 'FIX2', 'AC_Voltage_L3', 'V'],
+#    ['30777', 'S32', 'FIX0', 'AC_Power_L1', 'W'],
+#    ['30779', 'S32', 'FIX0', 'AC_Power_L2', 'W'],
+#    ['30781', 'S32', 'FIX0', 'AC_Power_L3', 'W'],
+    ['30803', 'U32', 'FIX2', 'Grid_Frequency', 'Hz'],
+    ['30773', 'S32', 'FIX0', 'DC_Input1_Power', 'W'],
+    ['30771', 'S32', 'FIX2', 'DC_Input1_Voltage', 'V'],
+    ['30769', 'S32', 'FIX3', 'DC_Input1_Current', 'A'],
+    ['30961', 'S32', 'FIX0', 'DC_Input2_Power', 'W'],
+    ['30959', 'S32', 'FIX2', 'DC_Input2_Voltage', 'V'],
+    ['30957', 'S32', 'FIX3', 'DC_Input2_Current', 'A'],
+    ['30953', 'S32', 'FIX1', 'Device_Temperature', u'\xb0C'],
+    ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],      #Don't change 'daily yield'    => it is used in some features/*.py files. As alternative use the mqtt topic 'SMA-EM/status/30028xxxxx/pvdaily' => 30028xxxxxs => see 'serials' above
+    ['30513', 'U64', 'FIX3', 'Total_Yield', 'kWh'],
+    ['30521', 'U64', 'FIX0', 'Operating_Time', 's'],
+    ['30525', 'U64', 'FIX0', 'Feed-in_Time', 's'],
+    ['30975', 'S32', 'FIX2', 'Intermediate_Circuit_Voltage', 'V'],
+    ['30225', 'S32', 'FIX0', 'Isolation_Resistance', u'\u03a9']
     ]
 
 [FEATURE-pvdata_kostal_json]

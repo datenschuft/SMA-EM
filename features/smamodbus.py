@@ -383,7 +383,6 @@ def get_pv_data(config):
     host = config.get('inv_host')
     port = config.get('inv_port', 502)
     modbusid = config.get('inv_modbus_id', 3)
-    manufacturer = config.get('inv_manufacturer', 'Default')
     # registers = [ ['30057', 'U32', 'RAW', 'serial', ''], ['30201','U32','ENUM','Status',''], ['30051','U32','ENUM','DeviceClass',''], ['30053','U32','ENUM','DeviceID',''], ['40631', 'STR32', 'UTF8', 'Device Name', ''], ['30775', 'S32', 'FIX0', 'AC Power', 'W'], ['30813', 'S32', 'FIX0', 'AC apparent power', 'VA'], ['30977', 'S32', 'FIX3', 'AC current', 'A'], ['30783', 'S32', 'FIX2', 'AC voltage', 'V'], ['30803', 'U32', 'FIX2', 'grid frequency', 'Hz'], ['30773', 'S32', 'FIX0', 'DC power', 'W'], ['30771', 'S32', 'FIX2', 'DC input voltage', 'V'], ['30777', 'S32', 'FIX0', 'Power L1', 'W'], ['30779', 'S32', 'FIX0', 'Power L2', 'W'], ['30781', 'S32', 'FIX0', 'Power L3', 'W'], ['30953', 'S32', 'FIX1', u'device temperature', u'\xb0C'], ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'], ['30513', 'U64', 'FIX3', 'total yield', 'kWh'], ['30521', 'U64', 'FIX0', 'operation time', 's'], ['30525', 'U64', 'FIX0', 'feed-in time', 's'], ['30975', 'S32', 'FIX2', 'intermediate voltage', 'V'], ['30225', 'S32', 'FIX0', 'Isolation resistance', u'\u03a9'] ]
     registerconfig = config.get('registers')
     registers = None

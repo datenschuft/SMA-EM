@@ -21,6 +21,14 @@ signal
 ```
 apt install python3-pip
 ```
+Feature pvdata reqires pymodbus
+```
+sudo pip install pymodbus
+```
+or
+```
+sudo pip3 install pymodbus
+```
 
 ## Configuration
 create a config file in /etc/smaemd/config<br>
@@ -30,7 +38,7 @@ Example:
 [SMA-EM]
 # serials of sma-ems the daemon should take notice
 # seperated by space
-serials=123456 1900204522
+serials=30028xxxxx
 # features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
 # list of features to load/run
 features=simplefswriter sample
@@ -68,20 +76,29 @@ sudo ip route add 224.0.0.0/4 dev interfacename
 
 ## Install / Copy (tested on Raspbian 9.1)
 ```
-apt install git
-apt install python3 cl-py-configparser
-mkdir /opt/smaemd/
-mkdir /etc/smaemd/
+sudo apt install git
+sudo apt install python3 cl-py-configparser
+sudo mkdir /opt/smaemd/
+sudo mkdir /etc/smaemd/
 cd /opt/smaemd/
-git clone https://github.com/datenschuft/SMA-EM.git .
-cp systemd-settings /etc/systemd/system/smaemd.service
+sudo git clone https://github.com/datenschuft/SMA-EM.git .
+sudo cp systemd-settings /etc/systemd/system/smaemd.service
 ```
-create a /etc/smaemd/config - file (see example above)<br>
-update systemd
+
+Create a /etc/smaemd/config file
 ```
-systemctl daemon-reload
-systemctl enable smaemd.service
-systemctl start smaemd.service
+sudo cp /opt/smaemd/config.sample /etc/smaemd/config
+```
+Edit the /etc/smaemd/config file and customize it to suit your needs (e.g. set SMA energy meter serial number, IP address, enable features)
+```
+sudo nano /etc/smaemd/config
+```
+
+Update systemd
+```
+sudo systemctl daemon-reload
+sudo systemctl enable smaemd.service
+sudo systemctl start smaemd.service
 ```
 feel lucky and read /run/shm/em-<serial>-<value>
 

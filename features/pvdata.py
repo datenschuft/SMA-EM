@@ -3,6 +3,7 @@
 
     2018-12-28 Tommi2Day
     2020-09-22 Tommi2Day fixes empty data exeptions
+    2021-01-02 sellth added support for multiple inverters
 
     Configuration:
     pip3 install pymodbus

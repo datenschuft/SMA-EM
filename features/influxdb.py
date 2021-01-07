@@ -231,13 +231,13 @@ def run(emparts, config):
         if influx_debug > 0:
             print('InfluxDBError: %s' % (format(e)))
             print("InfluxDB failed pv data:" + format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))),
-                  format(points))
+                  format(influx_data))
         pass
 
     else:
         if influx_debug > 0:
             print("InfluxDB: pv data published %s:%s" % (
-                format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points)))
+                format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(influx_data)))
 
 
 def stopping(emparts, config):

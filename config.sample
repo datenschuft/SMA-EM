@@ -1,7 +1,7 @@
 
 [SMA-EM]
 # serials of sma-ems the daemon should take notice
-# seperated by space
+# separated by space
 serials=30028xxxxx
 # features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
 # list of features to load/run
@@ -120,8 +120,8 @@ pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power 
 
 [FEATURE-pvdata]
 #Reads data from SMA inverter via Modbus.
-#Eable the mqtt feature to publish the data to a mqtt broker (features=pvdata mqtt),
-and/or stored the data to a influx database (features=pvdata influxdb), and/or symcom ...
+#Enable the mqtt feature to publish the data to a mqtt broker (features=pvdata mqtt),
+#and/or stored the data to a influx database (features=pvdata influxdb), and/or symcom ...
 
 # How frequently to send updates over (defaults to 20 sec)
 min_update=5
@@ -132,7 +132,6 @@ debug=0
 inv_host = <inverter-ip>
 inv_port = 502
 inv_modbus_id = 3
-inv_manufacturer = SMA
 
 #For Modbus registers, see e.g. https://www.google.com/search?q=SMA_Modbus-TI-en-23.xlsx
 #['Modbus register address', 'Format', 'Unit', 'Name', 'Type']
@@ -185,7 +184,7 @@ registers = [
       ['33555203', 'NONE', 'NONE', 'DC string1 power', 'W'],
       ['67109120', 'NONE', 'NONE', 'AC Power', 'W'],
       ['67110400', 'NONE', 'NONE', 'AC frequency', 'Hz'],
-      ['67110656', 'NONE', 'NONE', 'AC cosphi', '°'],
+      ['67110656', 'NONE', 'NONE', 'AC cosphi', u'\xb0C'],
       ['67110144', 'NONE', 'NONE', 'AC ptot limitation', ''],
       ['67109378', 'NONE', 'NONE', 'AC phase1 voltage', 'V'],
       ['67109377', 'NONE', 'NONE', 'AC phase1 current', 'A'],

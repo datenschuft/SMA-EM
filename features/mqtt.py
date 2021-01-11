@@ -4,6 +4,7 @@
     2018-12-23 Tommi2Day
     2019-03-02 david-m-m
     2020-09-22 Tommi2Day ssl support
+    2021-01-07 sellth added support for multiple inverters
 
     Configuration:
 
@@ -123,21 +124,26 @@ def run(emparts, config):
         data[f] = emparts.get(f, 0)
 
     # add pv data
+    pvpower = 0
+    daily = 0
     try:
-        # add summ value to
         from features.pvdata import pv_data
-        pvpower = pv_data.get("AC Power", 0)
-        if pvpower is None: pvpower = 0
+
+        for inv in pv_data:
+            # handle missing data during night hours
+            if inv.get("AC Power") is None:
+                pass
+            elif inv.get("DeviceClass") == "Solar Inverter":
+                pvpower += inv.get("AC Power", 0)
+                # NOTE: daily yield is broken for some inverters
+                daily += inv.get("daily yield", 0)
+
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
         data['pvsum'] = pvpower
         data['pusage'] = pusage
-        # daily sum
-        daily = pv_data.get("daily yield", 0)
-        if daily is None: daily = 0
         data['pvdaily'] = daily
-
     except:
         pv_data = None
         pass
@@ -166,17 +172,19 @@ def run(emparts, config):
         mqttpvtopic = config.get('pvtopic', None)
         if None not in [pv_data, mqttpvtopic]:
             if pv_data is not None:
-                pvserial = pv_data.get("serial")
-                pvtopic = mqttpvtopic + '/' + str(pvserial)
-                payload = json.dumps(pv_data)
-                # sendf pv topic
-                client.publish(pvtopic, payload)
-                if mqtt_debug > 0:
-                    print("mqtt: sma-pv topic %s data published %s:%s" % (pvtopic,
-                                                                          format(time.strftime("%H:%M:%S",
-                                                                                               time.localtime(
-                                                                                                   mqtt_last_update))),
-                                                                          payload))
+                for inv in pv_data:
+                    pvserial = inv.get("serial")
+                    pvtopic = mqttpvtopic + '/' + str(pvserial)
+                    payload = json.dumps(inv)
+                    # sendf pv topic
+                    client.publish(pvtopic, payload)
+                    if mqtt_debug > 0:
+                        print("mqtt: sma-pv topic %s data published %s:%s" % (
+                            pvtopic,
+                            format(time.strftime("%H:%M:%S",
+                                                 time.localtime(
+                                                     mqtt_last_update))),
+                            payload))
         client.loop_stop()
         client.disconnect()
 

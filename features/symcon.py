@@ -4,6 +4,7 @@
 
     2018-12-23 Tommi2Day
     2020-09-22 Tommi2Day fix empty pv data
+    2021-01-07 sellth added support for multiple inverters
 
     Configuration:
     [FEATURE-symcon]
@@ -55,13 +56,9 @@ def run(emparts, config):
 
     # mqtt client settings
     myhostname = platform.node()
-
     symcon_last_update = time.time()
 
     url = 'http://' + host + ':' + str(port) + emhook
-
-    # last aupdate
-    symcon_last_update = time.time()
 
     serial = emparts['serial']
     data = {}
@@ -118,6 +115,8 @@ def run(emparts, config):
     pvhook = config.get('pvhook')
     pvfields = config.get('pvfields', 'AC Power,daily yield')
     if None in [pvhook, pvfields]: return
+    pvurl = 'http://' + host + ':' + str(port) + pvhook
+
     try:
         from features.pvdata import pv_data
     except:
@@ -129,25 +128,6 @@ def run(emparts, config):
             print("Symcon EM: No PV Data")
 
         return
-    serial = pv_data['serial']
-    pvurl = 'http://' + host + ':' + str(port) + pvhook
-    pvpower = pv_data.get("AC Power")
-    if None in [serial, pvpower]: return
-    for f in pvfields.split(','):
-        data[f] = pv_data.get(f, 0)
-
-    data['timestamp'] = symcon_last_update
-    data['sender'] = myhostname
-    data['serial'] = str(serial)
-    pvpayload = json.dumps(data)
-
-    # prepare request
-    pvreq = urllib.request.Request(pvurl)
-    pvreq.add_header('Content-Type', 'application/json; charset=utf-8')
-    pvdataasbytes = pvpayload.encode('utf-8')  # needs to be bytes
-    pvreq.add_header('Content-Length', str(len(pvdataasbytes)))
-    # print(dataasbytes)
-    pvreq.add_header("User-Agent", "SMWR")
 
     # prepare auth
     if None not in [user, password]:
@@ -159,28 +139,45 @@ def run(emparts, config):
         if symcon_debug > 2:
             print('Symcon PV: use Basic auth')
 
-    # send it
+    # prepare request
+    pvreq = urllib.request.Request(pvurl)
+    pvreq.add_header('Content-Type', 'application/json; charset=utf-8')
+    pvreq.add_header("User-Agent", "SMWR")
 
-    try:
-        response = urllib.request.urlopen(pvreq, data=pvdataasbytes, timeout=int(timeout))
+    for inv in pv_data:
+        serial = inv.get("serial")
+        if serial is not None:
+            for f in pvfields.split(','):
+                data[f] = inv.get(f, 0)
 
-    except urllib.error.HTTPError as e:
-        if symcon_debug > 0:
-            print('Symcon PV : HTTPError: {%s} to %s ' % (format(e.reason), pvurl))
-        pass
-    except urllib.error.URLError as e:
-        if symcon_debug > 0:
-            print('Symcon PV: URLError: {%s} to %s ' % (format(e.reason), pvurl))
-        pass
-    except Exception as e:
-        if symcon_debug > 0:
-            print("Symcon PV: Error from symcon request")
-            print(e)
-        pass
-    else:
-        if symcon_debug > 0:
-            print("Symcon PV: data published %s:%s to %s" % (
-                format(time.strftime("%H:%M:%S", time.localtime(symcon_last_update))), pvpayload, pvurl))
+        data['timestamp'] = symcon_last_update
+        data['sender'] = myhostname
+        data['serial'] = str(serial)
+        pvpayload = json.dumps(data)
+        pvdataasbytes = pvpayload.encode('utf-8')  # needs to be bytes
+        pvreq.add_header('Content-Length', str(len(pvdataasbytes)))
+        # print(dataasbytes)
+
+        # send it
+        try:
+            response = urllib.request.urlopen(pvreq, data=pvdataasbytes, timeout=int(timeout))
+        except urllib.error.HTTPError as e:
+            if symcon_debug > 0:
+                print('Symcon PV : HTTPError: {%s} to %s ' % (format(e.reason), pvurl))
+            pass
+        except urllib.error.URLError as e:
+            if symcon_debug > 0:
+                print('Symcon PV: URLError: {%s} to %s ' % (format(e.reason), pvurl))
+            pass
+        except Exception as e:
+            if symcon_debug > 0:
+                print("Symcon PV: Error from symcon request")
+                print(e)
+            pass
+        else:
+            if symcon_debug > 0:
+                print("Symcon PV: data published %s:%s to %s" % (
+                    format(time.strftime("%H:%M:%S", time.localtime(symcon_last_update))), pvpayload, pvurl))
 
 
 def stopping(emparts, config):

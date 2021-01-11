@@ -164,16 +164,18 @@ pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power 
 
 # How frequently to send updates over (defaults to 20 sec)
 min_update=5
-#debug output
+# debug output
 debug=0
 
-#inverter connection
-inv_host = <inverter-ip>
-inv_port = 502
-inv_modbus_id = 3
+# inverter connection
+# ['host', 'port', 'modbus_id', 'manufacturer']
+inverters = [
+    ['<inverter-ip>', '502', '3', 'SMA'],
+    ['<inverter-ip>', '502', '3', 'SMA']
+    ]
 
 #For Modbus registers, see e.g. https://www.google.com/search?q=SMA_Modbus-TI-en-23.xlsx
-#['Modbus register address', 'Format', 'Unit', 'Name', 'Type']
+#['Modbus register address', 'Type', 'Format', 'Name', 'Unit']
 #If the mqtt feature is used, 'Name' is included in the MQTT JSON payload as tag name.
 registers = [
     ['30057', 'U32', 'RAW', 'serial', ''],               #Don't change 'serial'      => it is used in some features/*.py files. As alternative use the mqtt topic

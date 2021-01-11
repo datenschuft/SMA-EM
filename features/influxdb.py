@@ -3,6 +3,7 @@
 
     2018-12-28 Tommi2Day
     2020-09-22 Tommi2Day fix empty pv data and no ssl option
+    2021-01-02 sellth added support for multiple inverters
 
     Configuration:
     pip3 install influxdb datetime
@@ -125,12 +126,18 @@ def run(emparts, config):
     pdirectusage = 0
     try:
         from features.pvdata import pv_data
-        pvpower = 0
-        if pv_data != None:
-            pvpower = pv_data.get("AC Power", 0)
+
+        for inv in pv_data:
+            # handle missing data during night hours
+            if inv.get("AC Power") is None:
+                pass
+            elif inv.get("DeviceClass") == "Solar Inverter":
+                pvpower += inv.get("AC Power", 0)
+
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
+
         if pdirectusage is None: pdirectusage=0
         if pvpower > pusage:
             pdirectusage = pusage
@@ -183,21 +190,32 @@ def run(emparts, config):
     pvmeasurement = config.get('pvmeasurement')
     if None in [pvfields, pv_data, pvmeasurement]: return
 
-    influx_data = {}
-    data = {}
-    influx_data['measurement'] = pvmeasurement
-    influx_data['time'] = now
-    influx_data['tags'] = {}
-    # unly if we have values
-    if pv_data is not None:
-        for f in pvfields.split(','):
-            data[f] = pv_data.get(f)
-            if data[f] is None: data[f]=0.0
-        pvserial = pv_data.get('serial')
-        influx_data['tags']["serial"] = pvserial
+    influx_data = []
+    datapoint={
+            'measurement': pvmeasurement,
+            'time': now,
+            'tags': {},
+            'fields': {}
+            }
+    taglist = ['serial', 'DeviceID', 'Device Name']
+    tags = {}
+    fields = {}
+    for inv in pv_data:
+        # add tag columns and remove from data list
+        for t in taglist:
+            tags[t] = inv.get(t)
+            inv.pop(t)
 
-    influx_data['fields'] = data
-    points = [influx_data]
+        # only if we have values
+        if pv_data is not None:
+            for f in pvfields.split(','):
+                fields[f] = inv.get(f, 0)
+
+        datapoint['tags'] = tags.copy()
+        datapoint['fields'] = fields.copy()
+        influx_data.append(datapoint.copy())
+
+    points = influx_data
 
     # send it
     try:

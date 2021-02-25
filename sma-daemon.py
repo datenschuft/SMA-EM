@@ -139,6 +139,8 @@ if __name__ == "__main__":
 	if len(sys.argv) == 2:
 		if 'start' == sys.argv[1]:
 			daemon.start()
+		elif 'start_systemd' == sys.argv[1]:
+			daemon.start_systemd()
 		elif 'stop' == sys.argv[1]:
 			for featurenr in featurelist:
 				print('>>> stopping '+featurelist[featurenr]['name'])
@@ -146,6 +148,8 @@ if __name__ == "__main__":
 			daemon.stop()
 		elif 'restart' == sys.argv[1]:
 			daemon.restart()
+		elif 'restart_systemd' == sys.argv[1]:
+			daemon.restart_systemd()
 		elif 'run' == sys.argv[1]:
 			daemon.run()
 		else:
@@ -153,6 +157,6 @@ if __name__ == "__main__":
 			sys.exit(2)
 		sys.exit(0)
 	else:
-		print ("usage: %s start|stop|restart|run" % sys.argv[0])
+		print ("usage: %s start|start_systemd|stop|restart|restart_systemd|run" % sys.argv[0])
 		print (pidfile)
 		sys.exit(2)

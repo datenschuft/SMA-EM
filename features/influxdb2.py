@@ -34,7 +34,7 @@
 """
 
 import time
-import datetime
+from datetime import datetime
 from influxdb_client import InfluxDBClient, Point, WriteOptions, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS, WriteType
 
@@ -59,7 +59,6 @@ def run(emparts, config):
 
 	mesurement = config.get('measurement', 'SMAEM')
 	fields = config.get('fields', 'pconsume,psupply')
-	now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 	serial = emparts['serial']
 
 	# data fields
@@ -123,12 +122,12 @@ def run(emparts, config):
 	# data point
 	influx_data = {}
 	influx_data['measurement'] = mesurement
-	influx_data['time'] = now
+	influx_data['time'] = datetime.now()
 	influx_data['tags'] = {}
 	influx_data['tags']["serial"] = serial
 	influx_data['fields'] = data
 	points = [influx_data]
-
+	
 	# write em data
 	org = config.get('org', "my-org")
 	bucket = config.get('bucket', "my-bucket")
@@ -140,11 +139,18 @@ def run(emparts, config):
 	pvmeasurement = config.get('pvmeasurement')
 	if None in [pvfields, pv_data, pvmeasurement]:
 		return
+	
+	# pv data are empty on first call
+	if not pv_data:
+		if influx2_debug > 0:
+			print("pv_data empty")
+		return
+		
 	points = []
 	influx_data = []
 	datapoint = {
 		'measurement': pvmeasurement,
-		'time': now,
+		'time': datetime.now(),
 		'tags': {},
 		'fields': {}
 	}

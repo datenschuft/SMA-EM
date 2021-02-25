@@ -81,6 +81,7 @@ class daemon3x:
 		
 		# Start the daemon
 		self.daemonize()
+		self.config()
 		self.run()
 
 	def stop(self):
@@ -123,4 +124,7 @@ class daemon3x:
 		
 		It will be called after the process has been daemonized by 
 		start() or restart()."""
+		
+	def config(self):
+		"""overwritten in subclass"""
 

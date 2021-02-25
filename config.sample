@@ -153,6 +153,20 @@ measurement=SMAEM
 #A list of possible field names can be found above under FEATURE-mqtt
 fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 
+[FEATURE-influxdb2]
+debug=0
+url=hostname.tld
+token=long_token
+org=org_name
+bucket=bucket_name
+measurement=SMAEM
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
+#pvdata
+pvmeasurement=SMAWR
+pvvields=AC Power,AC Voltage,grid frequency,DC Power,DC input voltage,daily yield,total yield
+# How frequently to send updates over (defaults to 20 sec)
+min_update=30
+
 #pvdata
 pvmeasurement=SMAWR
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3

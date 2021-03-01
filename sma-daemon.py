@@ -62,29 +62,31 @@ else:
 
 import importlib
 
-#Check features and load
+# Check features and load
 featurelist = {}
 featurecounter=0
 for feature in features:
     #print ('import ' + feature + '.py')
-    featureitem={}
     featureitem = {'name': feature}
     try:
-       featureitem['feature'] = importlib.import_module('features.' + feature)
+        featureitem['feature'] = importlib.import_module('features.' + feature)
+    except ModuleNotFoundError as e:
+        print('Dependency problem: ' + str(e))
+        sys.exit()
     except (ImportError, FileNotFoundError, TypeError):
-       print('feature '+feature+ ' not found')
-       sys.exit()
+        print('feature '+feature+ ' not found')
+        sys.exit()
     try:
         featureitem['config']=dict(parser.items('FEATURE-'+feature))
         #print (featureitem['config'])
     except:
-       print('feature '+feature+ ' not configured')
-       sys.exit()
+        print('feature '+feature+ ' not configured')
+        sys.exit()
     try:
-		#run config action, if any
-       featureitem['feature'].config(featureitem['config'])
+        # run config action, if any
+        featureitem['feature'].config(featureitem['config'])
     except:
-       pass
+        pass
     featurelist[featurecounter]=featureitem
     featurecounter += 1
 

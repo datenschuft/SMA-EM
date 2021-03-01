@@ -21,10 +21,15 @@ SMA-EM-Daemon contributors
   * "mqtt" to send SMA EM and PV data to an MQTT broker
   * "remotedebug" to allow remote debug from PyCharm
   * "influxdb" and sample grafana dashboard based on this plugin
-  * "symcon" to supply SMA EM/HOM and PV data to "IP-Symcon" 
+  * "symcon" to supply SMA EM/HOM and PV data to "IP-Symcon"
 
 * **[david-m-m](https://github.com/david-m-m)**
 
   * enhance mqtt module to export topics for all metrics, works with [mqtt_exporter](https://github.com/bendikwa/mqtt_exporter)
   * rewrite SMA HM2.0 datagram parser
   * parse SMA EMETER datagrams
+
+
+* **[sellth](https://github.com/sellth)**
+
+  * improved reporting of missing module dependencies

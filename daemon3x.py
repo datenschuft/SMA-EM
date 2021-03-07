@@ -3,6 +3,7 @@
 """
 Source: http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/
 License Unknown
+* 2021-03-07 dervomsee improve the feature init
 """
 import sys, os, time, atexit, signal
 
@@ -56,8 +57,14 @@ class daemon3x:
 		atexit.register(self.delpid)
 
 		pid = str(os.getpid())
-		with open(self.pidfile,'w+') as f:
-			f.write(pid + '\n')
+		try:
+			with open(self.pidfile,'w+') as f:
+				f.write(pid + '\n')
+		except PermissionError:
+			message = "no access on pidfile"
+			sys.stderr.write(message.format(self.pidfile))
+			# my not work because of doubleforking
+			sys.exit(1)
 	
 	def delpid(self):
 		os.remove(self.pidfile)
@@ -68,7 +75,6 @@ class daemon3x:
 		# Check for a pidfile to see if the daemon already runs
 		try:
 			with open(self.pidfile,'r') as pf:
-
 				pid = int(pf.read().strip())
 		except IOError:
 			pid = None
@@ -78,7 +84,16 @@ class daemon3x:
 					"Daemon already running?\n"
 			sys.stderr.write(message.format(self.pidfile))
 			sys.exit(1)
-		
+		#check access to pid file, later checks my not generate readable output because of doubleforking
+		pid = str(os.getpid())
+		try:
+			with open(self.pidfile,'w+') as f:
+				f.write('checkpidaccess\n')
+		except PermissionError:
+			message = "no access on pidfile"
+			sys.stderr.write(message.format(self.pidfile))
+			sys.exit(1)
+
 		# Start the daemon
 		self.daemonize()
 		self.config()

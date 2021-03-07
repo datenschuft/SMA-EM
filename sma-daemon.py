@@ -18,6 +18,7 @@
  *
  * 2020-01-04 datenschuft changes to tun with speedwiredecoder
  * 2020-09-21 Tommi2Day add traceback for exception analysis
+ * 2021-03-07 datenschuft add config to run section (required beause of seperating moduleconfig to extra section by dervomsee
  */
 """
 import sys, time,os
@@ -102,6 +103,8 @@ class MyDaemon(daemon3x):
 			featurecounter += 1
 	def run(self):
 		# prepare listen to socket-Multicast
+		print("config")
+		self.config()
 		socketconnected = False
 		while not socketconnected:
 			#try:

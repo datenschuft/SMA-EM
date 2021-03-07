@@ -18,6 +18,7 @@
  *
  * 2020-01-04 datenschuft changes to tun with speedwiredecoder
  * 2020-09-21 Tommi2Day add traceback for exception analysis
+ * 2021-03-07 datenschuft add config to run section (required beause of seperating moduleconfig to extra section by dervomsee
  */
 """
 import sys, time,os
@@ -28,6 +29,7 @@ import socket
 import struct
 from speedwiredecoder import *
 import traceback
+import importlib
 
 #read configuration
 parser = ConfigParser()
@@ -59,46 +61,50 @@ if os.path.isdir(statusdir):
 else:
 	statusfile = "em-status"
 
-
-import importlib
-
-# Check features and load
+#feature list
 featurelist = {}
 featurecounter=0
-for feature in features:
-    #print ('import ' + feature + '.py')
-    featureitem = {'name': feature}
-    try:
-        featureitem['feature'] = importlib.import_module('features.' + feature)
-    except ModuleNotFoundError as e:
-        print('Dependency problem: ' + str(e))
-        sys.exit()
-    except (ImportError, FileNotFoundError, TypeError):
-        print('feature '+feature+ ' not found')
-        sys.exit()
-    try:
-        featureitem['config']=dict(parser.items('FEATURE-'+feature))
-        #print (featureitem['config'])
-    except:
-        print('feature '+feature+ ' not configured')
-        sys.exit()
-    try:
-        # run config action, if any
-        featureitem['feature'].config(featureitem['config'])
-    except:
-        pass
-    featurelist[featurecounter]=featureitem
-    featurecounter += 1
 
 #set defaults
 if MCAST_GRP == "":
-    MCAST_GRP = '239.12.255.254'
+	MCAST_GRP = '239.12.255.254'
 if MCAST_PORT == 0:
-    MCAST_PORT = 9522
+	MCAST_PORT = 9522
 
 class MyDaemon(daemon3x):
+	def config(self):
+		global featurelist
+		global featurecounter
+		global features
+		# Check features and load
+		for feature in features:
+			print ('import ' + feature + '.py')
+			featureitem = {'name': feature}
+			try:
+				featureitem['feature'] = importlib.import_module('features.' + feature)
+			except ModuleNotFoundError as e:
+				print('Dependency problem: ' + str(e))
+				sys.exit()
+			except (ImportError, FileNotFoundError, TypeError):
+				print('feature '+feature+ ' not found')
+				sys.exit()
+			try:
+				featureitem['config']=dict(parser.items('FEATURE-'+feature))
+				#print (featureitem['config'])
+			except:
+				print('feature '+feature+ ' not configured')
+				sys.exit()
+			try:
+				# run config action, if any
+				featureitem['feature'].config(featureitem['config'])
+			except:
+				pass
+			featurelist[featurecounter]=featureitem
+			featurecounter += 1
 	def run(self):
 		# prepare listen to socket-Multicast
+		print("config")
+		self.config()
 		socketconnected = False
 		while not socketconnected:
 			#try:

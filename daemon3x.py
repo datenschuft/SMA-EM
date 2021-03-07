@@ -99,6 +99,26 @@ class daemon3x:
 		self.config()
 		self.run()
 
+	def start_systemd(self):
+		"""Start the daemon."""
+
+		# Check for a pidfile to see if the daemon already runs
+		try:
+			with open(self.pidfile,'r') as pf:
+
+				pid = int(pf.read().strip())
+		except IOError:
+			pid = None
+	
+		if pid:
+			message = "pidfile {0} already exist. " + \
+					"Daemon already running?\n"
+			sys.stderr.write(message.format(self.pidfile))
+			sys.exit(1)
+		
+		#runc the main function without forking
+		self.run()
+
 	def stop(self):
 		"""Stop the daemon."""
 
@@ -133,6 +153,11 @@ class daemon3x:
 		"""Restart the daemon."""
 		self.stop()
 		self.start()
+
+	def restart_systemd(self):
+		"""Restart the daemon."""
+		self.stop()
+		self.start_systemd()
 
 	def run(self):
 		"""You should override this method when you subclass Daemon.

@@ -7,7 +7,7 @@ Type=simple
 # pre & postscripts as root
 #PermissionsStartonly=true
 # ExecuteStartPre=/usr/local/script-generate-directories
-ExecStart=/opt/smaemd/sma-daemon.py start
+ExecStart=/opt/smaemd/sma-daemon.py start_systemd
 ExecStop=/opt/smaemd/sma-daemon.py stop
 PIDFile=/var/run/smaemd.pid
 # ExecStartPost= nothing

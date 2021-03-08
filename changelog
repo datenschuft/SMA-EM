@@ -1,6 +1,7 @@
 SMA-EM-Daemon changelog-File
 20210307001
     improve the feature init
+    start_systemd; no doubleforking for Systemd
 
 20200104001
     fixed issue 21 new datagramsize with homemanager version 2.3.4.R

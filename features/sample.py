@@ -23,3 +23,12 @@ def stopping(emparts,config):
     """
     print("quitting")
     #close filehandles
+
+def config(config):
+    """
+    * executed on daemon config init
+    * do some configuration stuff...
+    """
+    global sw_debug
+    sw_debug = int(config.get('debug', 0))
+    print("sample: feature enabled")

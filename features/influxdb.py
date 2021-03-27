@@ -69,6 +69,7 @@ def run(emparts, config):
     fields = config.get('fields', 'pconsume,psupply')
     pvfields = config.get('pvfields')
     influx = None
+
     # connect to db, create one if needed
     try:
         if ssl == True:
@@ -121,9 +122,10 @@ def run(emparts, config):
     influx_data['time'] = now
     influx_data['tags'] = {}
     influx_data['tags']["serial"] = serial
-
     pvpower = 0
     pdirectusage = 0
+    pbattery = 0
+
     try:
         from features.pvdata import pv_data
 
@@ -132,20 +134,27 @@ def run(emparts, config):
             if inv.get("AC Power") is None:
                 pass
             elif inv.get("DeviceClass") == "Solar Inverter":
-                pvpower += inv.get("AC Power", 0)
+                pvpower += inv.get("AC Power")
+            elif inv.get("DeviceClass") == "Battery Inverter":
+                pbattery += inv.get("AC Power")
 
         pconsume = emparts.get('pconsume', 0)
         psupply = emparts.get('psupply', 0)
         pusage = pvpower + pconsume - psupply
+        # total power consumption (grid + battery discharge)
+        phouse = pvpower + pconsume - psupply + pbattery
 
         if pdirectusage is None: pdirectusage=0
         if pvpower > pusage:
             pdirectusage = pusage
         else:
             pdirectusage = pvpower
+
         data['pdirectusage'] = pdirectusage
         data['pvpower'] = float(pvpower)
         data['pusage'] = float(pusage)
+        data['pbattery'] = float(pbattery)
+        data['phouse'] = float(phouse)
     except:
         # Kostal inverter? (pvdata_kostal_json)
         print("except - no sma - inverter")
@@ -191,46 +200,44 @@ def run(emparts, config):
     if None in [pvfields, pv_data, pvmeasurement]: return
 
     influx_data = []
-    datapoint={
+    datapoint = {
             'measurement': pvmeasurement,
             'time': now,
             'tags': {},
             'fields': {}
-            }
+    }
     taglist = ['serial', 'DeviceID', 'Device Name']
     tags = {}
     fields = {}
-    for inv in pv_data:
-        # add tag columns and remove from data list
-        for t in taglist:
-            tags[t] = inv.get(t)
-            inv.pop(t)
 
-        # only if we have values
-        if pv_data is not None:
+    if pv_data is not None:
+        for inv in pv_data:
+            # add tag columns and remove from data list
+            for t in taglist:
+                tags[t] = inv.get(t)
+                inv.pop(t)
+
             for f in pvfields.split(','):
                 fields[f] = inv.get(f, 0)
 
-        datapoint['tags'] = tags.copy()
-        datapoint['fields'] = fields.copy()
-        influx_data.append(datapoint.copy())
-
-    points = influx_data
+            datapoint['tags'] = tags.copy()
+            datapoint['fields'] = fields.copy()
+            influx_data.append(datapoint.copy())
 
     # send it
     try:
-        influx.write_points(points, time_precision='s', protocol='json')
+        influx.write_points(influx_data, time_precision='s', protocol='json')
     except InfluxDBClientError as e:
         if influx_debug > 0:
             print('InfluxDBError: %s' % (format(e)))
             print("InfluxDB failed pv data:" + format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))),
-                  format(points))
+                  format(influx_data))
         pass
 
     else:
         if influx_debug > 0:
             print("InfluxDB: pv data published %s:%s" % (
-            format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(points)))
+                format(time.strftime("%H:%M:%S", time.localtime(influx_last_update))), format(influx_data)))
 
 
 def stopping(emparts, config):

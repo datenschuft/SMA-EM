@@ -406,6 +406,30 @@ pvenums = {
 }
 
 
+def get_device_class(host, port, modbusid):
+    client = ModbusClient(host=host, port=port)
+    try:
+        client.connect()
+    except:
+        print('Modbus Connection Error', 'could not connect to target. Check your settings, please.')
+        return None
+
+    try:
+        received = client.read_input_registers(address=30051, count=2, unit=3)
+    except:
+        thisdate = str(datetime.datetime.now()).partition('.')[0]
+        thiserrormessage = thisdate + ': Connection not possible. Check settings or connection.'
+        print(thiserrormessage)
+        return None
+
+    message = BinaryPayloadDecoder.fromRegisters(received.registers, byteorder=Endian.Big, wordorder=Endian.Big)
+    interpreted = message.decode_32bit_uint()
+    dclass = pvenums["DeviceClass"].get(interpreted)
+
+    client.close()
+    return dclass
+
+
 def get_pv_data(host, port, modbusid, registers):
     client = ModbusClient(host=host, port=port)
     try:

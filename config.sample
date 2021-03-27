@@ -5,7 +5,7 @@
 serials=30028xxxxx
 # features could filter serials to, but wouldn't see serials if these serials was not defines in SMA-EM serials
 # list of features to load/run
-#features=simplefswriter sample pvdata mqtt remotedebug symcon influxdb
+#features=simplefswriter sample pvdata ediplugs mqtt remotedebug symcon influxdb
 features=simplefswriter
 
 [DAEMON]
@@ -153,9 +153,26 @@ measurement=SMAEM
 #A list of possible field names can be found above under FEATURE-mqtt
 fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 
+[FEATURE-influxdb2]
+debug=0
+url=hostname.tld
+token=long_token
+org=org_name
+bucket=bucket_name
+measurement=SMAEM
+fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
+#pvdata
+pvmeasurement=SMAWR
+pvvields=AC Power,AC Voltage,grid frequency,DC Power,DC input voltage,daily yield,total yield
+# How frequently to send updates over (defaults to 20 sec)
+min_update=30
+
 #pvdata
 pvmeasurement=SMAWR
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
+
+#ediplugs
+edimeasurement=edimax
 
 [FEATURE-pvdata]
 #Reads data from SMA inverter via Modbus.
@@ -265,3 +282,17 @@ registers = [
       ['251658753', 'NONE', 'NONE', 'yield total', 'kWh'],
       ['251658496', 'NONE', 'NONE', 'operationtime', ''],
       ]
+
+[FEATURE-ediplugs]
+# How frequently to send updates over (defaults to 20 sec)
+min_update=15
+#debug output
+debug=0
+
+# Edimax SP-2101W V2 with Firmware 3.00c change their default password during initial setup.
+# Find the actual password using this hack: https://discourse.nodered.org/t/searching-for-help-to-read-status-of-edimax-smartplug/15789/6
+# ['<ip>', 'admin', '<password>']
+plugs = [
+    ['host1', 'admin', '1234'],
+    ['host2', 'admin', '1234']
+    ]

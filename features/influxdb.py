@@ -150,7 +150,7 @@ def run(emparts, config):
         else:
             pdirectusage = pvpower
 
-        data['pdirectusage'] = pdirectusage
+        data['pdirectusage'] = float(pdirectusage)
         data['pvpower'] = float(pvpower)
         data['pusage'] = float(pusage)
         data['pbattery'] = float(pbattery)

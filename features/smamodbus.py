@@ -408,10 +408,10 @@ pvenums = {
 
 def get_device_class(host, port, modbusid):
     client = ModbusClient(host=host, port=port)
-    try:
-        client.connect()
-    except:
-        print('Modbus Connection Error', 'could not connect to target. Check your settings, please.')
+
+    # connects even within if clause
+    if client.connect() == False:
+        print('Modbus Connection Error: Could not connect to', host)
         return None
 
     try:
@@ -432,10 +432,10 @@ def get_device_class(host, port, modbusid):
 
 def get_pv_data(host, port, modbusid, registers):
     client = ModbusClient(host=host, port=port)
-    try:
-        client.connect()
-    except:
-        print('Modbus Connection Error', 'could not connect to target. Check your settings, please.')
+
+    # connects even within if clause
+    if client.connect() == False:
+        print('Modbus Connection Error: Could not connect to', host)
         return None
 
     data = {}  ## empty data store for current values

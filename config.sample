@@ -152,6 +152,8 @@ measurement=SMAEM
 fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 
 # pvdata
+# Fields can be any modbus register queried under FEATURE-pvdata except serial, DeviceID, and Device Name,
+# as those are added as tags in any case.
 pvmeasurement=SMAWR
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
 
@@ -204,7 +206,7 @@ registers = [
     ['30201', 'U32', 'ENUM', 'Status',''],
     ['30051', 'U32', 'ENUM', 'DeviceClass',''],
     ['30053', 'U32', 'ENUM', 'DeviceID',''],
-#    ['40631', 'STR32', 'UTF8', 'Device_Name', ''],
+    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
     ['30775', 'S32', 'FIX0', 'AC Power', 'W'],
     ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],
 #################################################### 
@@ -237,7 +239,7 @@ registers_batt = [
     ['30201', 'U32', 'ENUM', 'Status',''],
     ['30051', 'U32', 'ENUM', 'DeviceClass',''],
     ['30053', 'U32', 'ENUM', 'DeviceID',''],
-#    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
+    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
     ['30775', 'S32', 'FIX0', 'AC Power', 'W'],
     ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],
 #################################################### 

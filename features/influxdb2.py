@@ -122,12 +122,12 @@ def run(emparts, config):
 	# data point
 	influx_data = {}
 	influx_data['measurement'] = mesurement
-	influx_data['time'] = datetime.now()
+	influx_data['time'] = datetime.utcnow()
 	influx_data['tags'] = {}
 	influx_data['tags']["serial"] = serial
 	influx_data['fields'] = data
 	points = [influx_data]
-	
+
 	# write em data
 	org = config.get('org', "my-org")
 	bucket = config.get('bucket', "my-bucket")
@@ -150,7 +150,7 @@ def run(emparts, config):
 	influx_data = []
 	datapoint = {
 		'measurement': pvmeasurement,
-		'time': datetime.now(),
+		'time': datetime.utcnow(),
 		'tags': {},
 		'fields': {}
 	}

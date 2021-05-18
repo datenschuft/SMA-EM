@@ -172,7 +172,7 @@ def run(emparts, config):
 				if inv.get(f) is None:
 					pass
 				else:
-					fields[f] = inv.get(f, 0)
+					fields[f] = inv.get(f)
 
 		datapoint['tags'] = tags.copy()
 		datapoint['fields'] = fields.copy()

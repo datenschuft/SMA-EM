@@ -1,5 +1,12 @@
 # SMA-EM
 
+a detailed german description could be found here
+https://www.unifox.at/software/sma-em-daemon/
+
+translated by google 
+https://translate.google.com/translate?sl=de&tl=en&u=https://www.unifox.at/software/sma-em-daemon/
+
+
 ## SMA Energymeter / Homemanager measurement
 sma-em-measurement.py: Python3 loop display SMA Energymeter measurement values
 

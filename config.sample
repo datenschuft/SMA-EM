@@ -147,11 +147,19 @@ password=
 min_update=30
 
 debug=0
-#emdata
-measurement=SMAEM
 
-#A list of possible field names can be found above under FEATURE-mqtt
+# emdata
+measurement=SMAEM
 fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
+# A list of possible field names can be found above under FEATURE-mqtt
+
+# pvdata
+pvmeasurement=SMAWR
+pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield
+# A list of possible field names can be found in the FEATURE-pvdata section below
+
+# ediplugs
+edimeasurement=edimax
 
 [FEATURE-influxdb2]
 debug=0
@@ -166,13 +174,6 @@ pvmeasurement=SMAWR
 pvvields=AC Power,AC Voltage,grid frequency,DC Power,DC input voltage,daily yield,total yield
 # How frequently to send updates over (defaults to 20 sec)
 min_update=30
-
-#pvdata
-pvmeasurement=SMAWR
-pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
-
-#ediplugs
-edimeasurement=edimax
 
 [FEATURE-pvdata]
 #Reads data from SMA inverter via Modbus.

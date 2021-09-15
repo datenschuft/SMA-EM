@@ -202,7 +202,7 @@ registers = [
     ['30201', 'U32', 'ENUM', 'Status',''],
     ['30051', 'U32', 'ENUM', 'DeviceClass',''],
     ['30053', 'U32', 'ENUM', 'DeviceID',''],
-#    ['40631', 'STR32', 'UTF8', 'Device_Name', ''],
+    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
     ['30775', 'S32', 'FIX0', 'AC Power', 'W'],
     ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],
 #################################################### 
@@ -235,7 +235,7 @@ registers_batt = [
     ['30201', 'U32', 'ENUM', 'Status',''],
     ['30051', 'U32', 'ENUM', 'DeviceClass',''],
     ['30053', 'U32', 'ENUM', 'DeviceID',''],
-#    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
+    ['40631', 'STR32', 'UTF8', 'Device Name', ''],
     ['30775', 'S32', 'FIX0', 'AC Power', 'W'],
     ['30517', 'U64', 'FIX3', 'daily yield', 'kWh'],
 #################################################### 

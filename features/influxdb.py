@@ -218,7 +218,7 @@ def run(emparts, config):
                 inv.pop(t)
 
             for f in pvfields.split(','):
-                fields[f] = inv.get(f, 0)
+                fields[f] = inv.get(f)
 
             datapoint['tags'] = tags.copy()
             datapoint['fields'] = fields.copy()

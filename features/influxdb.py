@@ -215,7 +215,6 @@ def run(emparts, config):
             # add tag columns and remove from data list
             for t in taglist:
                 tags[t] = inv.get(t)
-                inv.pop(t)
 
             for f in pvfields.split(','):
                 fields[f] = inv.get(f)
@@ -261,7 +260,6 @@ def run(emparts, config):
     for inv in edi_data:
         for t in taglist:
             tags[t] = inv.get(t)
-            inv.pop(t)
 
         for f in fieldlist:
             fields[f] = inv.get(f)

@@ -100,65 +100,66 @@ def decode_speedwire(datagram):
     # datagram length
     datalength=int.from_bytes(datagram[12:14],byteorder='big')+16
     #print('data lenght: {}'.format(datalength))
-    # serial number
-    emID=int.from_bytes(datagram[20:24],byteorder='big')
-    #print('seral: {}'.format(emID))
-    emparts['serial']=emID
-    # timestamp
-    timestamp=int.from_bytes(datagram[24:28],byteorder='big')
-    #print('timestamp: {}'.format(timestamp))
-    # decode OBIS data blocks
-    # start with header
-    position=28
-    while position<datalength:
-      # decode header
-      #print('pos: {}'.format(position))
-      (measurement,datatype)=decode_OBIS(datagram[position:position+4])
-      #print('measurement {} datatype: {}'.format(measurement,datatype))
-      # decode values
-      # actual values
-      if datatype=='actual':
-        value=int.from_bytes( datagram[position+4:position+8], byteorder='big' )
-        position+=8
-        if measurement in sma_channels.keys():
-          emparts[sma_channels[measurement][0]]=value/sma_units[sma_channels[measurement][1]]
-          emparts[sma_channels[measurement][0]+'unit']=sma_channels[measurement][1]
-      # counter values
-      elif datatype=='counter':
-        value=int.from_bytes( datagram[position+4:position+12], byteorder='big' )
-        position+=12
-        if measurement in sma_channels.keys():
-          emparts[sma_channels[measurement][0]+'counter']=value/sma_units[sma_channels[measurement][2]]
-          emparts[sma_channels[measurement][0]+'counterunit']=sma_channels[measurement][2]
-      elif datatype=='version':
-        value=datagram[position+4:position+8]
-        if measurement in sma_channels.keys():
-          bversion=(binascii.b2a_hex(value).decode("utf-8"))
-          version=str(int(bversion[0:2],16))+"."+str(int(bversion[2:4],16))+"."+str(int(bversion[4:6],16))
-          revision=str(chr(int(bversion[6:8])))
-          #revision definitions
-          if revision=="1":
-              #S – Spezial Version
-              version=version+".S"
-          elif revision=="2":
-              #A – Alpha (noch kein Feature Complete, Version für Verifizierung und Validierung)
-              version=version+".A"
-          elif revision=="3":
-              #B – Beta (Feature Complete, Version für Verifizierung und Validierung)
-              version=version+".B"
-          elif revision=="4":
-              #R – Release Candidate / Release (Version für Verifizierung, Validierung und Feldtest / öffentliche Version)
-              version=version+".R"
-          elif revision=="5":
-              #E – Experimental Version (dient zur lokalen Verifizierung)
-              version=version+".E"
-          elif revision=="6":
-              #N – Keine Revision
-              version=version+".N"
-          #adding versionnumber to compare versions
-          version=version+"|"+str(bversion[0:2])+str(bversion[2:4])+str(bversion[4:6])
-          emparts[sma_channels[measurement][0]]=version
-        position+=8
-      else:
-        position+=8
+    if datalength != 54:
+      # serial number
+      emID=int.from_bytes(datagram[20:24],byteorder='big')
+      #print('seral: {}'.format(emID))
+      emparts['serial']=emID
+      # timestamp
+      timestamp=int.from_bytes(datagram[24:28],byteorder='big')
+      #print('timestamp: {}'.format(timestamp))
+      # decode OBIS data blocks
+      # start with header
+      position=28
+      while position<datalength:
+        # decode header
+        #print('pos: {}'.format(position))
+        (measurement,datatype)=decode_OBIS(datagram[position:position+4])
+        #print('measurement {} datatype: {}'.format(measurement,datatype))
+        # decode values
+        # actual values
+        if datatype=='actual':
+          value=int.from_bytes( datagram[position+4:position+8], byteorder='big' )
+          position+=8
+          if measurement in sma_channels.keys():
+            emparts[sma_channels[measurement][0]]=value/sma_units[sma_channels[measurement][1]]
+            emparts[sma_channels[measurement][0]+'unit']=sma_channels[measurement][1]
+        # counter values
+        elif datatype=='counter':
+          value=int.from_bytes( datagram[position+4:position+12], byteorder='big' )
+          position+=12
+          if measurement in sma_channels.keys():
+            emparts[sma_channels[measurement][0]+'counter']=value/sma_units[sma_channels[measurement][2]]
+            emparts[sma_channels[measurement][0]+'counterunit']=sma_channels[measurement][2]
+        elif datatype=='version':
+          value=datagram[position+4:position+8]
+          if measurement in sma_channels.keys():
+            bversion=(binascii.b2a_hex(value).decode("utf-8"))
+            version=str(int(bversion[0:2],16))+"."+str(int(bversion[2:4],16))+"."+str(int(bversion[4:6],16))
+            revision=str(chr(int(bversion[6:8])))
+            #revision definitions
+            if revision=="1":
+                #S – Spezial Version
+                version=version+".S"
+            elif revision=="2":
+                #A – Alpha (noch kein Feature Complete, Version für Verifizierung und Validierung)
+                version=version+".A"
+            elif revision=="3":
+                #B – Beta (Feature Complete, Version für Verifizierung und Validierung)
+                version=version+".B"
+            elif revision=="4":
+                #R – Release Candidate / Release (Version für Verifizierung, Validierung und Feldtest / öffentliche Version)
+                version=version+".R"
+            elif revision=="5":
+                #E – Experimental Version (dient zur lokalen Verifizierung)
+                version=version+".E"
+            elif revision=="6":
+                #N – Keine Revision
+                version=version+".N"
+            #adding versionnumber to compare versions
+            version=version+"|"+str(bversion[0:2])+str(bversion[2:4])+str(bversion[4:6])
+            emparts[sma_channels[measurement][0]]=version
+          position+=8
+        else:
+          position+=8
   return emparts

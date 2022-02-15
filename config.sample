@@ -153,7 +153,7 @@ fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
 
 # pvdata
 # Fields can be any modbus register queried under FEATURE-pvdata except serial, DeviceID, and Device Name,
-# as those are added as tags in any case.
+# as those are used as tags in any case.
 pvmeasurement=SMAWR
 pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
 
@@ -166,17 +166,19 @@ url=hostname.tld
 token=long_token
 org=org_name
 bucket=bucket_name
+
+# emdata
+# A list of possible field names can be found above under FEATURE-mqtt
 measurement=SMAEM
 fields=pconsume,psupply,p1consume,p2consume,p3consume,p1supply,p2supply,p3supply
-#pvdata
+
+# pvdata
+# Fields can be any modbus register queried under FEATURE-pvdata except serial, DeviceID, and Device Name,
+# as those are used as tags in any case.
 pvmeasurement=SMAWR
-pvvields=AC Power,AC Voltage,grid frequency,DC Power,DC input voltage,daily yield,total yield
+pvfields=AC Power,AC Voltage,grid frequency,DC Power,DC input voltage,daily yield,total yield
 # How frequently to send updates over (defaults to 20 sec)
 min_update=30
-
-#pvdata
-pvmeasurement=SMAWR
-pvfields=AC Power,grid frequency,DC input voltage,daily yield,total yield,Power L1,Power L2,Power L3
 
 [FEATURE-pvdata]
 #Reads data from SMA inverter via Modbus.

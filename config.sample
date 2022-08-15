@@ -33,7 +33,7 @@ statusdir=
 nothing=here
 
 [FEATURE-mqtt]
-# MQTT broker details
+# The Feature acts as client - put here the MQTT server/broker details
 #mqtthost=::1
 mqtthost=mqtt
 mqttport=1883

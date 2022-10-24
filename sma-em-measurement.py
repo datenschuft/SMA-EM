@@ -73,6 +73,8 @@ except BaseException:
 while True:
   emparts = {}
   emparts=decode_speedwire(sock.recv(608))
+  if len(emparts) == 0:
+      continue
   # Output...
   # don't know what P,Q and S means:
   # http://en.wikipedia.org/wiki/AC_power or http://de.wikipedia.org/wiki/Scheinleistung

@@ -132,11 +132,12 @@ class MyDaemon(daemon3x):
 				emparts=decode_speedwire(sock.recv(608))
 				for serial in serials:
 					# process only known sma serials
-					if serial==format(emparts['serial']):
-						# running all enabled features
-						for featurenr in featurelist:
-							#print('>>> starting '+featurelist[featurenr]['name'])
-							featurelist[featurenr]['feature'].run(emparts,featurelist[featurenr]['config'])
+					if 'serial' in emparts:
+						if serial==format(emparts['serial']):
+							# running all enabled features
+							for featurenr in featurelist:
+								#print('>>> starting '+featurelist[featurenr]['name'])
+								featurelist[featurenr]['feature'].run(emparts,featurelist[featurenr]['config'])
 			except Exception as e:
 				print("Daemon: Exception occured")
 				print(traceback.format_exc())

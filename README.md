@@ -114,3 +114,27 @@ feel lucky and read /run/shm/em-<serial>-<value>
 ## Testing
 sma-em-capture-package - trys to capture a SMA-EM or SMA-homemanager Datagram and display hex and ascii package-info and all recogniced measurement values.
 Cloud be helpful on package/software changes.
+
+## Docker
+
+SMA-EM can be run as a dockerized application, which is very useful if you're unable to use the sma homeassistant add-on, but still want this functionality without polluting your host operating system with bespoke python modules, git repos etc.
+
+The simplest way to build and run SMA-EM in docker is to use docker-compose, like so:
+
+```shell
+docker-compose up -d
+```
+
+Attention: This requires a working configuration file at `./smaemd/config` - this can of course be changed in `docker-compose.yml`.
+
+If you want to be more manual about this, build the SMA-EM docker container yourself:
+
+```shell
+docker build -t sma-em .
+```
+
+To run, a minimal command line looks like this:
+
+```shell
+docker run --network=host -v ./smaemd:/etc/smaemd sma-em
+```

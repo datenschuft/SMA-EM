@@ -10,10 +10,6 @@ WORKDIR /opt/smaemd
 RUN git clone https://github.com/datenschuft/SMA-EM.git .
 RUN pip3 install -r requirements.txt 
 
-# Fix https://github.com/datenschuft/SMA-EM/pull/82
-COPY patch.diff .
-RUN git apply patch.diff
-
 ADD run_smaemd.sh /root/
 RUN chmod +x /root/*
 CMD ["/root/run_smaemd.sh"]

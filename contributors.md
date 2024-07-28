@@ -33,3 +33,8 @@ SMA-EM-Daemon contributors
 * **[sellth](https://github.com/sellth)**
 
   * improved reporting of missing module dependencies
+
+* **[AnotherDaniel](https://github.com/AnotherDaniel)**
+
+  * robustness check for dictionary content
+

@@ -1,4 +1,9 @@
 SMA-EM-Daemon changelog-File
+20240728001
+    robustness check for dictionary content
+    documentation switch from root to a new user (example smaemd in systemd-unit)
+    focus on core competencies, remove features except mqtt and simplefswriter (other moved to features-outdated)
+
 20210307001
     improve the feature init
     start_systemd; no doubleforking for Systemd

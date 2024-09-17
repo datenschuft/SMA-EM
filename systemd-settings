@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
+User=smaemd
 # pre & postscripts as root
 #PermissionsStartonly=true
 # ExecuteStartPre=/usr/local/script-generate-directories

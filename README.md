@@ -25,17 +25,10 @@ time
 configparser (SafeConfigParser)
 signal
 
-```
-apt install python3-pip
-```
-Feature pvdata reqires pymodbus
-```
-sudo pip install pymodbus
-```
-or
-```
-sudo pip3 install pymodbus
-```
+some features require additional python modules
+features/README.md should give an overview of maintained features.
+features-outdated/README.md: other features untested because I do not have the appropriate hardware / software could be found in features-outdated.
+
 
 ## Configuration
 create a config file in /etc/smaemd/config<br>
@@ -87,6 +80,7 @@ sudo apt install git
 sudo apt install python3 cl-py-configparser
 sudo mkdir /opt/smaemd/
 sudo mkdir /etc/smaemd/
+sudo useradd -c "smaemd-user" -d /opt/smaemd -M -N -r -s /usr/sbin/nologin smaemd
 cd /opt/smaemd/
 sudo git clone https://github.com/datenschuft/SMA-EM.git .
 sudo cp systemd-settings /etc/systemd/system/smaemd.service

@@ -10,7 +10,7 @@ User=smaemd
 # ExecuteStartPre=/usr/local/script-generate-directories
 ExecStart=/opt/smaemd/sma-daemon.py start_systemd
 ExecStop=/opt/smaemd/sma-daemon.py stop
-PIDFile=/var/run/smaemd.pid
+PIDFile=/run/smaemd.pid
 # ExecStartPost= nothing
 #TimeoutSec=30
 #Private tmp
